@@ -1,5 +1,5 @@
 import type { Chain } from "thirdweb";
-import { avalancheFuji, polygonAmoy } from "./chains";
+import { avalancheFuji, polygonAmoy, plasmaTestnet } from "./chains";
 
 export type NftContract = {
   address: string;
@@ -71,5 +71,23 @@ export const NFT_CONTRACTS: NftContract[] = [
     thumbnailUrl:
       "https://258c828e8cc853bf5e0efd001055fb39.ipfscdn.io/ipfs/bafybeif2nz6wbwuryijk2c4ayypocibexdeirlvmciqjyvlzz46mzoirtm/0.png",
     type: "ERC1155",
+  },
+  {
+    address: "0xBe1f61BcfCAE0b83B02BD59946CDEfeDA4Bc2EB1",
+    chain: plasmaTestnet,
+    title: "Plasma Enumerable",
+    description: "Plasma Enumerable NFT collection on Plasma testnet",
+    thumbnailUrl: "/plasma-enumerable-logo.png", // You can update this with your actual logo
+    slug: "plasma-enumerable",
+    type: "ERC721",
+  },
+  {
+    address: "0xC5c28aA8DA13588CBf8B23D9c57FB2DA98aebcE0",
+    chain: plasmaTestnet,
+    title: "PlasmaGirl NFT Open",
+    description: "PlasmaGirl NFT Open collection on Plasma testnet",
+    thumbnailUrl: "/plasmagirl-logo.png", // You can update this with your actual logo
+    slug: "plasmagirl-nft-open",
+    type: "ERC721",
   },
 ];
