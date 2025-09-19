@@ -3,6 +3,7 @@ import { DropHero } from '@/components/drop-page/DropHero';
 import { DropStats } from '@/components/drop-page/DropStats';
 import { ClaimAction } from '@/components/drop-page/ClaimAction';
 import { ClaimControls } from '@/components/drop-page/ClaimControls';
+import { client } from '@/consts/client';
 import { useNftDropContext } from '@/hooks/useNftDropContext';
 import { Box, Flex, Heading, Skeleton, Stack, Text } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -14,7 +15,7 @@ import {
 } from 'thirdweb/react';
 import { canClaim } from 'thirdweb/extensions/erc721';
 import { toTokens } from 'thirdweb/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function DropClaim() {
   const {
@@ -36,7 +37,10 @@ export function DropClaim() {
   const account = useActiveAccount();
   const activeChain = useActiveWalletChain();
   const switchChain = useSwitchActiveWalletChain();
-  const { open: openConnectModal } = useConnectModal();
+  const { connect } = useConnectModal();
+  const handleConnect = useCallback(() => {
+    void connect({ client });
+  }, [connect]);
 
   const [quantity, setQuantity] = useState(1);
 
@@ -45,12 +49,13 @@ export function DropClaim() {
       return 0n;
     }
     const limits: bigint[] = [];
-    const phaseRemaining =
-      activeClaimCondition.maxClaimableSupply > 0n
-        ? activeClaimCondition.maxClaimableSupply - activeClaimCondition.supplyClaimed
-        : null;
-    if (phaseRemaining && phaseRemaining > 0n) {
-      limits.push(phaseRemaining);
+    const maxSupply = ensureBigInt(activeClaimCondition.maxClaimableSupply);
+    const supplyClaimed = ensureBigInt(activeClaimCondition.supplyClaimed);
+    if (maxSupply > 0n) {
+      const phaseRemaining = maxSupply - supplyClaimed;
+      if (phaseRemaining > 0n) {
+        limits.push(phaseRemaining);
+      }
     }
     if (activeClaimCondition.quantityLimitPerWallet > 0n) {
       limits.push(activeClaimCondition.quantityLimitPerWallet);
@@ -227,7 +232,7 @@ export function DropClaim() {
                   startsInSeconds={startsInSeconds}
                   currencySymbol={currencySymbol}
                   totalPriceDisplay={totalPriceDisplay}
-                  onConnect={() => openConnectModal?.()}
+                  onConnect={handleConnect}
                   onSwitchChain={() => switchChain(drop.chain)}
                   isCheckingEligibility={eligibilityQuery.isLoading || eligibilityQuery.isFetching}
                   refreshEligibility={() => eligibilityQuery.refetch()}
@@ -262,6 +267,10 @@ export function DropClaim() {
       </Stack>
     </Flex>
   );
+}
+
+function ensureBigInt(value: bigint | number | string) {
+  return typeof value === 'bigint' ? value : BigInt(value);
 }
 
 function decodeEligibilityReason(reason: string) {

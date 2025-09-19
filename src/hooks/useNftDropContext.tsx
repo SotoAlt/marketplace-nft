@@ -4,7 +4,7 @@ import { client } from '@/consts/client';
 import { DROP_CONTRACTS, type DropContract } from '@/consts/drop_contracts';
 import { Box, Spinner } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import type { AbiFunction } from 'abitype';
+import type { Abi, AbiFunction } from 'abitype';
 import { type ReactNode, createContext, useContext, useMemo } from 'react';
 import { getContract, type ThirdwebContract } from 'thirdweb';
 import { resolveContractAbi } from 'thirdweb/contract';
@@ -19,7 +19,17 @@ import {
 } from 'thirdweb/extensions/erc721';
 import { useReadContract } from 'thirdweb/react';
 import { toFunctionSelector } from 'thirdweb/utils';
-import type { ClaimCondition } from 'thirdweb/dist/types/utils/extensions/drops/types';
+
+type ClaimCondition = {
+  startTimestamp: bigint;
+  maxClaimableSupply: bigint;
+  supplyClaimed: bigint;
+  quantityLimitPerWallet: bigint;
+  merkleRoot: string;
+  pricePerToken: bigint;
+  currency: string;
+  metadata: string;
+};
 
 type NftDropContextValue = {
   contract: ThirdwebContract;
@@ -96,10 +106,10 @@ export default function NftDropProvider({
     queryKey: ['drop', 'selectors', drop.chain.id, drop.address.toLowerCase()],
     queryFn: async () => {
       // Keeping this resolver ensures we can swap contracts later without changing the UI logic.
-      const abi = await resolveContractAbi(contract);
-      return abi
-        .filter((item): item is AbiFunction => item.type === 'function')
-        .map((fn) => toFunctionSelector(fn));
+      const abi = (await resolveContractAbi(contract)) as Abi;
+      return (abi.filter((item) => item.type === 'function') as AbiFunction[]).map((fn) =>
+        toFunctionSelector(fn)
+      );
     },
   });
 
@@ -114,7 +124,7 @@ export default function NftDropProvider({
   const { data: isERC721Contract, isLoading: isLoadingErc721 } = useReadContract(isERC721, {
     contract,
     queryOptions: {
-      retry: false,
+      retry: 0,
     },
   });
 
@@ -140,7 +150,7 @@ export default function NftDropProvider({
     contract,
     queryOptions: {
       enabled: shouldEnableDropsQueries,
-      retry: false,
+      retry: 0,
     },
   });
 
@@ -152,7 +162,7 @@ export default function NftDropProvider({
     contract,
     queryOptions: {
       enabled: shouldEnableDropsQueries,
-      retry: false,
+      retry: 0,
     },
   });
 

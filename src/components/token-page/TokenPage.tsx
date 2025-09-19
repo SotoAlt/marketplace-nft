@@ -119,9 +119,8 @@ export function Token(props: Props) {
                 </AccordionItem>
               )}
 
-              {nft?.metadata?.attributes &&
-                // @ts-ignore TODO FIx later
-                nft?.metadata?.attributes.length > 0 && (
+              {Array.isArray(nft?.metadata?.attributes) &&
+                nft.metadata.attributes.length > 0 && (
                   <NftAttributes attributes={nft.metadata.attributes} />
                 )}
 
