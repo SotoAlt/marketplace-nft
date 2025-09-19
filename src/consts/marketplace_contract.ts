@@ -1,5 +1,5 @@
-import type { Chain } from "thirdweb";
-import { avalancheFuji, polygonAmoy, sepolia, plasmaTestnet } from "./chains";
+import type { Chain } from 'thirdweb';
+import { avalancheFuji, polygonAmoy, sepolia, plasmaTestnet } from './chains';
 
 type MarketplaceContract = {
   address: string;
@@ -12,19 +12,19 @@ type MarketplaceContract = {
  */
 export const MARKETPLACE_CONTRACTS: MarketplaceContract[] = [
   {
-    address: "0x8C1D464B385A2B7EAa80dcAAD66DD8BC0256e717",
+    address: '0x8C1D464B385A2B7EAa80dcAAD66DD8BC0256e717',
     chain: avalancheFuji,
   },
   {
-    address: "0x571B773F1e4A7C080b51C36f37e06f371C515569",
+    address: '0x571B773F1e4A7C080b51C36f37e06f371C515569',
     chain: polygonAmoy,
   },
   {
-    address: "0xe0eFD6fb388405b67b3E9FaFc02649c70E749f03",
+    address: '0xe0eFD6fb388405b67b3E9FaFc02649c70E749f03',
     chain: sepolia,
   },
   {
-    address: "0x0d94Ff4570Ef35569e6d0591eE09a88E44488207",
+    address: '0x0d94Ff4570Ef35569e6d0591eE09a88E44488207',
     chain: plasmaTestnet,
-  }
+  },
 ];

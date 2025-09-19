@@ -7,20 +7,14 @@ import {
   Card,
   Flex,
   Text,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
-export function NftAttributes({
-  attributes,
-}: {
-  attributes: Record<string, unknown>;
-}) {
+export function NftAttributes({ attributes }: { attributes: Record<string, unknown> }) {
   /**
    * Assume the NFT attributes follow the conventional format
    */
   // @ts-ignore TODO Fix later
-  const items = attributes.filter(
-    (item: Record<string, unknown>) => item.trait_type
-  );
+  const items = attributes.filter((item: Record<string, unknown>) => item.trait_type);
   return (
     <AccordionItem>
       <Text>
@@ -42,7 +36,7 @@ export function NftAttributes({
               gap={2}
               py={2}
               px={4}
-              bg={"transparent"}
+              bg={'transparent'}
               border="1px"
             >
               {item.trait_type && (
@@ -51,9 +45,7 @@ export function NftAttributes({
                 </Text>
               )}
               <Text size="label.md" textAlign="center" fontWeight="bold">
-                {typeof item.value === "object"
-                  ? JSON.stringify(item.value || {})
-                  : item.value}
+                {typeof item.value === 'object' ? JSON.stringify(item.value || {}) : item.value}
               </Text>
             </Card>
           ))}
