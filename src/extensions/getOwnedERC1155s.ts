@@ -1,9 +1,5 @@
-import { type BaseTransactionOptions, type NFT, readContract } from "thirdweb";
-import {
-  balanceOfBatch,
-  getNFT,
-  nextTokenIdToMint,
-} from "thirdweb/extensions/erc1155";
+import { type BaseTransactionOptions, type NFT, readContract } from 'thirdweb';
+import { balanceOfBatch, getNFT, nextTokenIdToMint } from 'thirdweb/extensions/erc1155';
 
 export type GetERC1155sParams = {
   /**
@@ -54,15 +50,15 @@ export async function getOwnedERC1155s(
   const maxId = await Promise.allSettled([
     readContract({
       contract: contract,
-      method: "function nextTokenId() view returns (uint256)",
+      method: 'function nextTokenId() view returns (uint256)',
       params: [],
     }),
     nextTokenIdToMint(options),
   ]).then(([_next, _nextToMint]) => {
-    if (_next.status === "fulfilled") {
+    if (_next.status === 'fulfilled') {
       return _next.value;
     }
-    if (_nextToMint.status === "fulfilled") {
+    if (_nextToMint.status === 'fulfilled') {
       return _nextToMint.value;
     }
     throw Error("Contract doesn't have required extension");
@@ -96,9 +92,7 @@ export async function getOwnedERC1155s(
   }
 
   const nfts = await Promise.all(
-    ownedBalances.map((ob) =>
-      getNFT({ ...options, tokenId: BigInt(ob.tokenId) })
-    )
+    ownedBalances.map((ob) => getNFT({ ...options, tokenId: BigInt(ob.tokenId) }))
   );
 
   return nfts.map((nft, index) => ({

@@ -1,16 +1,12 @@
-"use client";
+'use client';
 
-import { ProfileSection } from "@/components/profile-page/Profile";
-import { useResolveENSAddress } from "@/hooks/useResolveENSAddress";
-import { Box, Text } from "@chakra-ui/react";
-import { notFound } from "next/navigation";
-import { isAddress } from "thirdweb/utils";
+import { ProfileSection } from '@/components/profile-page/Profile';
+import { useResolveENSAddress } from '@/hooks/useResolveENSAddress';
+import { Box, Text } from '@chakra-ui/react';
+import { notFound } from 'next/navigation';
+import { isAddress } from 'thirdweb/utils';
 
-export default function PublicProfilePage({
-  params,
-}: {
-  params: { addressOrENS: string };
-}) {
+export default function PublicProfilePage({ params }: { params: { addressOrENS: string } }) {
   const { addressOrENS } = params;
   const isValidEvmAddress = isAddress(addressOrENS);
   const { data: resolvedAddress, isLoading } = useResolveENSAddress({

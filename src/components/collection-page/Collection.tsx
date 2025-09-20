@@ -1,12 +1,12 @@
-import { MediaRenderer, useReadContract } from "thirdweb/react";
-import { getNFT as getNFT721 } from "thirdweb/extensions/erc721";
-import { getNFT as getNFT1155 } from "thirdweb/extensions/erc1155";
-import { client } from "@/consts/client";
-import { Box, Flex, Heading, Tab, TabList, Tabs, Text } from "@chakra-ui/react";
-import { useState } from "react";
-import { useMarketplaceContext } from "@/hooks/useMarketplaceContext";
-import { ListingGrid } from "./ListingGrid";
-import { AllNftsGrid } from "./AllNftsGrid";
+import { MediaRenderer, useReadContract } from 'thirdweb/react';
+import { getNFT as getNFT721 } from 'thirdweb/extensions/erc721';
+import { getNFT as getNFT1155 } from 'thirdweb/extensions/erc1155';
+import { client } from '@/consts/client';
+import { Box, Flex, Heading, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
+import { useState } from 'react';
+import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
+import { ListingGrid } from './ListingGrid';
+import { AllNftsGrid } from './AllNftsGrid';
 
 export function Collection() {
   // `0` is Listings, `1` is `Auctions`
@@ -22,7 +22,7 @@ export function Collection() {
 
   // In case the collection doesn't have a thumbnail, we use the image of the first NFT
   const { data: firstNFT, isLoading: isLoadingFirstNFT } = useReadContract(
-    type === "ERC1155" ? getNFT1155 : getNFT721,
+    type === 'ERC1155' ? getNFT1155 : getNFT721,
     {
       contract: nftContract,
       tokenId: 0n,
@@ -32,8 +32,7 @@ export function Collection() {
     }
   );
 
-  const thumbnailImage =
-    contractMetadata?.image || firstNFT?.metadata.image || "";
+  const thumbnailImage = contractMetadata?.image || firstNFT?.metadata.image || '';
   return (
     <>
       <Box mt="24px">
@@ -42,22 +41,16 @@ export function Collection() {
             client={client}
             src={thumbnailImage}
             style={{
-              marginLeft: "auto",
-              marginRight: "auto",
-              borderRadius: "20px",
-              width: "200px",
-              height: "200px",
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              borderRadius: '20px',
+              width: '200px',
+              height: '200px',
             }}
           />
-          <Heading mx="auto">
-            {contractMetadata?.name || "Unknown collection"}
-          </Heading>
+          <Heading mx="auto">{contractMetadata?.name || 'Unknown collection'}</Heading>
           {contractMetadata?.description && (
-            <Text
-              maxW={{ lg: "500px", base: "300px" }}
-              mx="auto"
-              textAlign="center"
-            >
+            <Text maxW={{ lg: '500px', base: '300px' }} mx="auto" textAlign="center">
               {contractMetadata.description}
             </Text>
           )}
@@ -72,14 +65,10 @@ export function Collection() {
             <TabList>
               <Tab>Listings ({listingsInSelectedCollection.length || 0})</Tab>
               <Tab>
-                All items{" "}
+                All items{' '}
                 {supplyInfo
-                  ? `(${(
-                      supplyInfo.endTokenId -
-                      supplyInfo.startTokenId +
-                      1n
-                    ).toString()})`
-                  : ""}
+                  ? `(${(supplyInfo.endTokenId - supplyInfo.startTokenId + 1n).toString()})`
+                  : ''}
               </Tab>
               {/* Support for English Auctions coming soon */}
               {/* <Tab>Auctions ({allAuctions?.length || 0})</Tab> */}
