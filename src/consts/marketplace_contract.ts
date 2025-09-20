@@ -20,7 +20,7 @@ export const MARKETPLACE_CONTRACTS: MarketplaceContract[] = [
     chain: polygonAmoy,
   },
   {
-    address: '0xe0eFD6fb388405b67b3E9FaFc02649c70E749f03',
+    address: '0x481e01cf24dE1715804608ddB14508d9892d5181',
     chain: sepolia,
   },
   {

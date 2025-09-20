@@ -35,13 +35,13 @@ type NftDropContextValue = {
   contract: ThirdwebContract;
   drop: DropContract;
   contractMetadata:
-    | {
-        [key: string]: unknown;
-        name?: string;
-        description?: string;
-        image?: string;
-      }
-    | undefined;
+  | {
+    [key: string]: unknown;
+    name?: string;
+    description?: string;
+    image?: string;
+  }
+  | undefined;
   activeClaimCondition: ClaimCondition | undefined;
   activeClaimError: Error | null;
   claimConditions: ClaimCondition[] | undefined;
@@ -130,6 +130,7 @@ export default function NftDropProvider({
 
   const shouldEnableDropsQueries = Boolean(claimSupported);
 
+
   const {
     data: contractMetadata,
     isLoading: isLoadingMetadata,
@@ -140,6 +141,8 @@ export default function NftDropProvider({
       enabled: shouldEnableDropsQueries,
     },
   });
+
+
 
   const {
     data: activeClaimCondition,
