@@ -1,19 +1,18 @@
 'use client';
 
-import { NFT_CONTRACTS } from '@/consts/nft_contracts';
+import { NFT_CONTRACTS, type NftContract } from '@/consts/nft_contracts';
+import { client } from '@/consts/client';
 import { Link } from '@chakra-ui/next-js';
 import {
   Box,
-  Card,
-  CardBody,
-  CardHeader,
   Flex,
   Heading,
-  Image,
-  Stack,
-  StackDivider,
   Text,
 } from '@chakra-ui/react';
+import { getContract } from 'thirdweb';
+import { getContractMetadata } from 'thirdweb/extensions/common';
+import { MediaRenderer, useReadContract } from 'thirdweb/react';
+import { useMemo } from 'react';
 
 export default function Home() {
   return (
@@ -25,18 +24,7 @@ export default function Home() {
           </Heading>
           <Flex direction="row" wrap="wrap" mt="20px" gap="5" justifyContent="space-evenly">
             {NFT_CONTRACTS.map((item) => (
-              <Link
-                _hover={{ textDecoration: 'none' }}
-                w={300}
-                h={400}
-                key={item.address}
-                href={`/collection/${item.chain.id.toString()}/${item.address}`}
-              >
-                <Image src={item.thumbnailUrl} />
-                <Text fontSize="large" mt="10px">
-                  {item.title}
-                </Text>
-              </Link>
+              <CollectionCard key={`${item.chain.id}-${item.address}`} item={item} />
             ))}
           </Flex>
         </Flex>
@@ -45,3 +33,56 @@ export default function Home() {
   );
 }
 
+function CollectionCard({ item }: { item: NftContract }) {
+  const contract = useMemo(
+    () =>
+      getContract({
+        client,
+        chain: item.chain,
+        address: item.address,
+      }),
+    [item]
+  );
+
+  const { data: rawMetadata } = useReadContract(getContractMetadata, {
+    contract,
+    queryOptions: {
+      staleTime: 60_000,
+    },
+  });
+
+  const metadata = rawMetadata as
+    | {
+        name?: string;
+        description?: string;
+        image?: string;
+      }
+    | undefined;
+
+  const title = metadata?.name ?? item.title ?? 'Collection';
+  const imageSrc = metadata?.image ?? item.thumbnailUrl ?? '';
+
+  return (
+    <Link
+      _hover={{ textDecoration: 'none' }}
+      w={300}
+      h={400}
+      href={`/collection/${item.chain.id.toString()}/${item.address}`}
+    >
+      <Box w="100%" h={300} overflow="hidden" borderRadius="md" borderWidth="1px">
+        {imageSrc ? (
+          <MediaRenderer
+            client={client}
+            src={imageSrc}
+            style={{ height: '100%', width: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : (
+          <Box height="100%" bg="gray.700" />
+        )}
+      </Box>
+      <Text fontSize="large" mt="10px">
+        {title}
+      </Text>
+    </Link>
+  );
+}
