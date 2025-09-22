@@ -47,7 +47,6 @@ function CollectionCard({ item }: { item: NftContract }) {
   const { data: rawMetadata } = useReadContract(getContractMetadata, {
     contract,
     queryOptions: {
-      staleTime: 60_000,
     },
   });
 

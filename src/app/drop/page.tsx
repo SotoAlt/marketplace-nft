@@ -44,7 +44,6 @@ function DropCard({ drop }: { drop: DropContract }) {
     // Let it fetch in background; UI will fallback to local values.
     queryOptions: {
       // small cache to avoid refetching repeatedly when navigating
-      staleTime: 60_000,
     },
   });
 
