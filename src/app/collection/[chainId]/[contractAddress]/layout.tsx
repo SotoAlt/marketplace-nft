@@ -1,5 +1,5 @@
-import MarketplaceProvider from "@/hooks/useMarketplaceContext";
-import type { ReactNode } from "react";
+import MarketplaceProvider from '@/hooks/useMarketplaceContext';
+import type { ReactNode } from 'react';
 
 export default function MarketplaceLayout({
   children,
@@ -9,10 +9,7 @@ export default function MarketplaceLayout({
   params: { contractAddress: string; chainId: string };
 }) {
   return (
-    <MarketplaceProvider
-      chainId={params.chainId}
-      contractAddress={params.contractAddress}
-    >
+    <MarketplaceProvider chainId={params.chainId} contractAddress={params.contractAddress}>
       {children}
     </MarketplaceProvider>
   );

@@ -1,14 +1,8 @@
-import { client } from "@/consts/client";
-import { useMarketplaceContext } from "@/hooks/useMarketplaceContext";
-import { Link } from "@chakra-ui/next-js";
-import {
-  Box,
-  Flex,
-  SimpleGrid,
-  useBreakpointValue,
-  Text,
-} from "@chakra-ui/react";
-import { MediaRenderer } from "thirdweb/react";
+import { client } from '@/consts/client';
+import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
+import { Link } from '@chakra-ui/next-js';
+import { Box, Flex, SimpleGrid, useBreakpointValue, Text } from '@chakra-ui/react';
+import { MediaRenderer } from 'thirdweb/react';
 
 export function ListingGrid() {
   const { listingsInSelectedCollection, nftContract } = useMarketplaceContext();
@@ -31,15 +25,14 @@ export function ListingGrid() {
           href={`/collection/${nftContract.chain.id}/${
             nftContract.address
           }/token/${item.asset.id.toString()}`}
-          _hover={{ textDecoration: "none" }}
+          _hover={{ textDecoration: 'none' }}
         >
           <Flex direction="column">
             <MediaRenderer client={client} src={item.asset.metadata.image} />
-            <Text>{item.asset?.metadata?.name ?? "Unknown item"}</Text>
+            <Text>{item.asset?.metadata?.name ?? 'Unknown item'}</Text>
             <Text>Price</Text>
             <Text>
-              {item.currencyValuePerToken.displayValue}{" "}
-              {item.currencyValuePerToken.symbol}
+              {item.currencyValuePerToken.displayValue} {item.currencyValuePerToken.symbol}
             </Text>
           </Flex>
         </Box>
