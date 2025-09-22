@@ -37,4 +37,13 @@ export const NFT_CONTRACTS: NftContract[] = [
     slug: 'plasmagirl-nft-open',
     type: 'ERC721',
   },
+  {
+    address: '0x6d3EBD12eb82653f872344EC4d0e15B8C0C32c83',
+    chain: sepolia,
+    title: 'Sepolia NFT Drop collection',
+    description: 'Sepolia NFT Drop collection',
+    thumbnailUrl: '/plasmagirl-logo.png', // You can update this with your actual logo
+    slug: 'sepolia-nft-drop-collection',
+    type: 'ERC721',
+  }
 ];
