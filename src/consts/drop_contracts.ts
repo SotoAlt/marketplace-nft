@@ -1,5 +1,5 @@
 import type { Chain } from 'thirdweb';
-import { base, sepolia } from './chains';
+import { base, plasmaTestnet, sepolia } from './chains';
 
 export type DropContract = {
   address: string;
@@ -13,14 +13,14 @@ export type DropContract = {
 
 export const DROP_CONTRACTS: DropContract[] = [
   {
-    address: '0x9f761CdAE083143973B7EB238B8344783240b589',
-    chain: base,
+    address: '0x3d5c08df863085a516de9820C836E7c0d632A831',
+    chain: plasmaTestnet,
     type: 'DropERC721',
-    title: 'Base Drop Placeholder',
-    description: 'Claim experimental Base drop tokens while supplies last.',
+    title: 'Plasma Testnet Drop NFT',
+    description: 'Claim experimental Plasma Testnet drop tokens while supplies last.',
     thumbnailUrl:
       'https://nft-cdn.thirdweb.com/ipfs/QmQzUo3rgsH1ZMVXQw6T68J5mhS5PaAn9KnQWpN6wiwkF7/0.png',
-    slug: 'base-drop-placeholder',
+    slug: 'plasma-testnet-drop-placeholder',
   },
   {
     address: '0x6d3EBD12eb82653f872344EC4d0e15B8C0C32c83',

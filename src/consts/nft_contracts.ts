@@ -29,6 +29,15 @@ export const NFT_CONTRACTS: NftContract[] = [
     type: 'ERC721',
   },
   {
+    address: '0x3d5c08df863085a516de9820C836E7c0d632A831',
+    chain: plasmaTestnet,
+    title: 'Plasma Testnet Drop NFT test collection',
+    description: 'Plasma Testnet Drop NFT test collection on Plasma Testnet',
+    thumbnailUrl: 'https://d391b93f5f62d9c15f67142e43841acc.ipfscdn.io/ipfs/QmRqHh9fxeoezmhaGHEFWAwWshmkttUJgaK3PBtuBLPggR/SCR-20250117-td9.jpeg', // You can update this with your actual logo
+    slug: 'plasma-testnet-drop-nft-test-collection',
+    type: 'ERC721',
+  },
+  {
     address: '0xC5c28aA8DA13588CBf8B23D9c57FB2DA98aebcE0',
     chain: plasmaTestnet,
     title: 'PlasmaGirl NFT Open',
