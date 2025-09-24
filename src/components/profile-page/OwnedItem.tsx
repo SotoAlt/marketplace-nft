@@ -1,4 +1,4 @@
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { Link } from '@chakra-ui/next-js';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import type { NFT, ThirdwebContract } from 'thirdweb';
@@ -18,7 +18,7 @@ export function OwnedItem(props: { nft: NFT; nftCollection: ThirdwebContract }) 
         w={250}
       >
         <Flex direction="column">
-          <MediaRenderer client={client} src={nft.metadata.image} />
+          <MediaRenderer client={client} src={nft.metadata.image || NFT_PLACEHOLDER_IMAGE} />
           <Text>{nft.metadata?.name ?? 'Unknown item'}</Text>
         </Flex>
       </Box>

@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { NFT_CONTRACTS, type NftContract } from '@/consts/nft_contracts';
 import { MediaRenderer, useActiveAccount, useReadContract } from 'thirdweb/react';
 import { getContract, toEther } from 'thirdweb';
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { getOwnedERC721s } from '@/extensions/getOwnedERC721s';
 import { OwnedItem } from './OwnedItem';
 import { getAllValidListings } from 'thirdweb/extensions/marketplace';
@@ -165,7 +165,10 @@ export function ProfileSection(props: Props) {
                             w={250}
                           >
                             <Flex direction="column">
-                              <MediaRenderer client={client} src={item.asset.metadata.image} />
+                              <MediaRenderer
+                                client={client}
+                                src={item.asset.metadata.image || NFT_PLACEHOLDER_IMAGE}
+                              />
                               <Text mt="12px">{item.asset?.metadata?.name ?? 'Unknown item'}</Text>
                               <Text>Price</Text>
                               <Text>

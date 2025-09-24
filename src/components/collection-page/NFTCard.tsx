@@ -1,4 +1,4 @@
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { Link } from '@chakra-ui/next-js';
 import { Box, Text, HStack } from '@chakra-ui/react';
 import { MediaRenderer } from 'thirdweb/react';
@@ -40,7 +40,7 @@ export function NFTCard({ nft, href, showPrice = false, price }: NFTCardProps) {
     >
       <MediaRenderer
         client={client}
-        src={nft.metadata.image}
+        src={nft.metadata.image || NFT_PLACEHOLDER_IMAGE}
         style={{
           width: '100%',
           aspectRatio: '0.9',

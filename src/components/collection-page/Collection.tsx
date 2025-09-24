@@ -2,7 +2,7 @@
 import { MediaRenderer, useReadContract } from 'thirdweb/react';
 import { getNFT as getNFT721 } from 'thirdweb/extensions/erc721';
 import { getNFT as getNFT1155 } from 'thirdweb/extensions/erc1155';
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import {
   Box,
   Flex,
@@ -43,7 +43,8 @@ export function Collection() {
     }
   );
 
-  const thumbnailImage = contractMetadata?.image || firstNFT?.metadata.image || '';
+  const thumbnailImage =
+    contractMetadata?.image || firstNFT?.metadata.image || NFT_PLACEHOLDER_IMAGE;
   return (
     <Box mt="24px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
       <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 10 }} align="stretch">

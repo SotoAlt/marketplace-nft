@@ -1,4 +1,4 @@
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import {
   Accordion,
   AccordionButton,
@@ -94,7 +94,7 @@ export function Token(props: Props) {
               <Box position="relative">
                 <MediaRenderer
                   client={client}
-                  src={nft?.metadata.image}
+                  src={nft?.metadata.image || NFT_PLACEHOLDER_IMAGE}
                   style={{
                     width: '100%',
                     height: 'auto',
