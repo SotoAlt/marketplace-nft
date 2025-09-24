@@ -1,11 +1,25 @@
 'use client';
-import { DropHero } from '@/components/drop-page/DropHero';
-import { DropStats } from '@/components/drop-page/DropStats';
 import { ClaimAction } from '@/components/drop-page/ClaimAction';
 import { ClaimControls } from '@/components/drop-page/ClaimControls';
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { useNftDropContext } from '@/hooks/useNftDropContext';
-import { Box, Flex, Heading, Skeleton, Stack, Text } from '@chakra-ui/react';
+import {
+  Badge,
+  Box,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Progress,
+  Skeleton,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+} from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import {
   useActiveAccount,
@@ -16,6 +30,16 @@ import {
 import { canClaim } from 'thirdweb/extensions/erc721';
 import { toTokens } from 'thirdweb/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { MediaRenderer } from 'thirdweb/react';
+import {
+  CardBody as TiltBody,
+  CardContainer as TiltContainer,
+  CardItem as TiltItem,
+} from '@/components/ui/3d-card';
+import { Icon } from '@chakra-ui/react';
+import { FaDiscord, FaGlobe, FaInstagram, FaTwitter, FaLink } from 'react-icons/fa6';
+import type { IconType } from 'react-icons';
 
 export function DropClaim() {
   const {
@@ -176,95 +200,231 @@ export function DropClaim() {
     ? decodeEligibilityReason(activeClaimError.message)
     : null;
 
+  const imageSrc = contractMetadata?.image ?? drop.thumbnailUrl ?? NFT_PLACEHOLDER_IMAGE;
+
+  // Derived totals for the progress display
+  const totalSupply =
+    totalClaimed !== undefined && totalUnclaimed !== undefined
+      ? totalClaimed + totalUnclaimed
+      : undefined;
+
+  const mintedPct = useMemo(() => {
+    if (totalSupply === undefined || totalClaimed === undefined || totalSupply === 0n) {
+      return 0;
+    }
+    // Keep two decimals without floating bigint math overflow
+    const pctTimes100 = Number((totalClaimed * 10000n) / totalSupply);
+    return Math.min(100, Math.max(0, pctTimes100 / 100));
+  }, [totalClaimed, totalSupply]);
+
+  const statusBadge = isSoldOut
+    ? { label: 'Sold Out', colorScheme: 'red' as const }
+    : isDropReady
+      ? { label: 'Minting now', colorScheme: 'green' as const }
+      : { label: 'Coming soon', colorScheme: 'yellow' as const };
+
+  // Attempt to extract social links from contract metadata.
+  type SocialLink = { platform: string; url: string };
+  const socialLinks: SocialLink[] = useMemo(() => {
+    const linksField = (contractMetadata as any)?.links;
+    const result: SocialLink[] = [];
+    const push = (platform: string, url?: string) => {
+      if (url && typeof url === 'string') {
+        result.push({ platform, url });
+      }
+    };
+    // Preferred format: [{ platform, link }]
+    if (Array.isArray(linksField)) {
+      for (const entry of linksField) {
+        const p = (entry?.platform ?? '').toString();
+        const u = (entry?.link ?? entry?.url ?? '').toString();
+        if (p && u) result.push({ platform: p, url: u });
+      }
+    }
+    // Fallback common fields
+    const m = contractMetadata as any;
+    push('website', m?.website || m?.external_link || m?.external_url);
+    push('twitter', m?.twitter || m?.x);
+    push('discord', m?.discord);
+    push('instagram', m?.instagram);
+    push('mirror', m?.mirror);
+    push('github', m?.github);
+    push('telegram', m?.telegram);
+    // Deduplicate by url
+    const seen = new Set<string>();
+    return result.filter((r) => {
+      if (!r.url) return false;
+      if (seen.has(r.url)) return false;
+      seen.add(r.url);
+      return true;
+    });
+  }, [contractMetadata]);
+
   return (
-    <Flex direction="column" gap={10} maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
-      <Stack spacing={8}>
-        <Heading>Drop Claim</Heading>
-        {activeClaimErrorMessage && (
-          <Box borderWidth="1px" borderRadius="lg" p={4} borderColor="orange.500">
-            <Text color="orange.200">{activeClaimErrorMessage}</Text>
-          </Box>
-        )}
-        <DropHero
-          drop={drop}
-          contractMetadata={contractMetadata}
-          sharePath={sharePath}
-          isLoading={isLoading}
-        />
-        <DropStats
-          totalClaimed={totalClaimed}
-          totalUnclaimed={totalUnclaimed}
-          isLoading={isLoading}
-          startsInSeconds={startsInSeconds}
-          isDropReady={isDropReady}
-          priceDisplay={pricePerTokenDisplay}
-          currencySymbol={currencySymbol}
-        />
-        <Flex direction={{ base: 'column', lg: 'row' }} gap={8}>
-          <Box flex="1" minW={0}>
-            <ClaimControls
-              quantity={quantity}
-              onDecrement={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-              onIncrement={() => setQuantity((prev) => Math.min(prev + 1, maxQuantityNumber))}
-              maxQuantity={maxQuantityNumber}
-              pricePerTokenDisplay={pricePerTokenDisplay}
-              totalPriceDisplay={totalPriceDisplay}
-              currencySymbol={currencySymbol}
-              eligibilityMessage={parsedEligibilityReason}
-              isCheckingEligibility={eligibilityQuery.isLoading || eligibilityQuery.isFetching}
-              isSoldOut={isSoldOut}
-              isDropReady={isDropReady}
-              maxPerWalletLabel={maxPerWalletLabel}
-              action={
-                <ClaimAction
-                  quantity={quantity}
-                  account={account}
-                  isConnected={isConnected}
-                  isCorrectChain={Boolean(isCorrectChain)}
-                  isDropReady={isDropReady}
-                  isSoldOut={isSoldOut}
-                  canClaim={canClaimNow}
-                  eligibilityReason={
-                    eligibilityResult?.reason
-                      ? decodeEligibilityReason(eligibilityResult.reason)
-                      : parsedEligibilityReason
-                  }
-                  startsInSeconds={startsInSeconds}
-                  currencySymbol={currencySymbol}
-                  totalPriceDisplay={totalPriceDisplay}
-                  onConnect={handleConnect}
-                  onSwitchChain={() => switchChain(drop.chain)}
-                  isCheckingEligibility={eligibilityQuery.isLoading || eligibilityQuery.isFetching}
-                  refreshEligibility={() => eligibilityQuery.refetch()}
-                  chainName={drop.chain.name ?? 'Target Chain'}
-                />
-              }
-            />
-          </Box>
-          <Box flex="1" minW={0}>
-            <Skeleton isLoaded={!isLoading} borderRadius="lg" minH="200px" p={6}>
-              <Stack spacing={4}>
-                <Heading size="md">Claim Conditions</Heading>
-                {claimConditions?.length ? (
-                  claimConditions.map((condition, index) => (
-                    <Box key={index} borderWidth="1px" borderRadius="lg" p={4}>
-                      <Text fontWeight="semibold">Phase {index + 1}</Text>
-                      <Text fontSize="sm" color="gray.400">
-                        Max supply: {condition.maxClaimableSupply.toString()}
-                      </Text>
-                      <Text fontSize="sm" color="gray.400">
-                        Claimed: {condition.supplyClaimed.toString()}
-                      </Text>
+    <Flex direction="column" gap={8} maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
+      {activeClaimErrorMessage && (
+        <Box borderWidth="1px" borderRadius="0" p={4} borderColor="orange.500">
+          <Text color="orange.200">{activeClaimErrorMessage}</Text>
+        </Box>
+      )}
+
+      <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={{ base: 6, md: 10 }}>
+        {/* Left: media + description */}
+        <GridItem>
+          <TiltContainer containerStyle={{ padding: 0 }} style={{ width: '100%' }}>
+            <TiltBody style={{ width: '100%', height: 'auto' }}>
+              <TiltItem translateZ={60} style={{ width: '100%' }}>
+                <Box w="100%" borderWidth="1px" borderRadius="0" overflow="hidden">
+                  <MediaRenderer
+                    client={client}
+                    src={imageSrc}
+                    style={{ height: '100%', width: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                </Box>
+              </TiltItem>
+            </TiltBody>
+          </TiltContainer>
+          <Skeleton isLoaded={!isLoading} mt={4}>
+            <Text color="gray.300">{contractMetadata?.description ?? drop.description}</Text>
+          </Skeleton>
+        </GridItem>
+
+        {/* Right: details + actions */}
+        <GridItem>
+          <Stack spacing={6}>
+            <Stack spacing={2}>
+              <Badge colorScheme={statusBadge.colorScheme} width="fit-content" borderRadius="0">
+                {statusBadge.label}
+              </Badge>
+              <Skeleton isLoaded={!isLoading} minH="40px">
+                <Heading
+                  size="lg"
+                  lineHeight="1.2"
+                  bgGradient="linear(to-r, purple.300, pink.300)"
+                  bgClip="text"
+                >
+                  {contractMetadata?.name ?? drop.title}
+                </Heading>
+              </Skeleton>
+              <Text color="gray.500" fontSize="sm">
+                {drop.chain.name}
+              </Text>
+              {socialLinks.length > 0 && (
+                <Flex gap={2} mt={1} wrap="wrap">
+                  {socialLinks.map((item, i) => (
+                    <SocialIconLink
+                      key={`${item.platform}-${i}`}
+                      platform={item.platform}
+                      url={item.url}
+                    />
+                  ))}
+                </Flex>
+              )}
+            </Stack>
+
+            <Tabs variant="line" colorScheme="purple">
+              <TabList>
+                <Tab>Overview</Tab>
+                <Tab isDisabled>Activity</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel px={0}>
+                  <Stack spacing={6}>
+                    {/* Minted progress */}
+                    <Box
+                      borderWidth="1px"
+                      borderRadius="0"
+                      p={4}
+                      _hover={{ boxShadow: '0 0 0 1px var(--chakra-colors-purple-400)' }}
+                    >
+                      <Flex justify="space-between" align="center" mb={3}>
+                        <Text fontWeight="semibold">Total minted</Text>
+                        <Text color="gray.400" fontSize="sm">
+                          {totalClaimed !== undefined && totalSupply !== undefined
+                            ? `${mintedPct}% (${totalClaimed.toString()} / ${totalSupply.toString()})`
+                            : '-'}
+                        </Text>
+                      </Flex>
+                      <Progress value={mintedPct} size="sm" borderRadius="0" colorScheme="yellow" />
                     </Box>
-                  ))
-                ) : (
-                  <Text color="gray.400">No additional claim conditions configured.</Text>
-                )}
-              </Stack>
-            </Skeleton>
-          </Box>
-        </Flex>
-      </Stack>
+
+                    {/* Claim UI */}
+                    <Box
+                      borderWidth="2px"
+                      borderRadius="0"
+                      p={6}
+                      _hover={{ boxShadow: '0 0 0 2px var(--chakra-colors-yellow-400)' }}
+                    >
+                      <Flex justify="space-between" mb={6} align="center">
+                        <Text
+                          fontWeight="semibold"
+                          letterSpacing="wide"
+                          textTransform="uppercase"
+                          fontSize="sm"
+                        >
+                          Public
+                        </Text>
+                        <Badge
+                          colorScheme={statusBadge.colorScheme}
+                          borderRadius="0"
+                          variant="solid"
+                        >
+                          {isSoldOut ? 'Closed' : isDropReady ? 'Mint Open' : 'Pending'}
+                        </Badge>
+                      </Flex>
+                      <ClaimControls
+                        quantity={quantity}
+                        onDecrement={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+                        onIncrement={() =>
+                          setQuantity((prev) => Math.min(prev + 1, maxQuantityNumber))
+                        }
+                        maxQuantity={maxQuantityNumber}
+                        pricePerTokenDisplay={pricePerTokenDisplay}
+                        totalPriceDisplay={totalPriceDisplay}
+                        currencySymbol={currencySymbol}
+                        eligibilityMessage={parsedEligibilityReason}
+                        isCheckingEligibility={
+                          eligibilityQuery.isLoading || eligibilityQuery.isFetching
+                        }
+                        isSoldOut={isSoldOut}
+                        isDropReady={isDropReady}
+                        maxPerWalletLabel={maxPerWalletLabel}
+                        withContainer={false}
+                        action={
+                          <ClaimAction
+                            quantity={quantity}
+                            account={account}
+                            isConnected={isConnected}
+                            isCorrectChain={Boolean(isCorrectChain)}
+                            isDropReady={isDropReady}
+                            isSoldOut={isSoldOut}
+                            canClaim={canClaimNow}
+                            eligibilityReason={
+                              eligibilityResult?.reason
+                                ? decodeEligibilityReason(eligibilityResult.reason)
+                                : parsedEligibilityReason
+                            }
+                            startsInSeconds={startsInSeconds}
+                            currencySymbol={currencySymbol}
+                            totalPriceDisplay={totalPriceDisplay}
+                            onConnect={handleConnect}
+                            onSwitchChain={() => switchChain(drop.chain)}
+                            isCheckingEligibility={
+                              eligibilityQuery.isLoading || eligibilityQuery.isFetching
+                            }
+                            refreshEligibility={() => eligibilityQuery.refetch()}
+                            chainName={drop.chain.name ?? 'Target Chain'}
+                          />
+                        }
+                      />
+                    </Box>
+                  </Stack>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Stack>
+        </GridItem>
+      </Grid>
     </Flex>
   );
 }
@@ -294,4 +454,34 @@ function decodeEligibilityReason(reason: string) {
     return 'No active claim condition configured yet.';
   }
   return reason;
+}
+
+function SocialIconLink({ platform, url }: { platform: string; url: string }) {
+  const p = platform.toLowerCase();
+  const label = `${platform} link`;
+  let IconComp: IconType = FaLink;
+  if (p.includes('website') || p.includes('external') || p.includes('site') || p.includes('web'))
+    IconComp = FaGlobe;
+  if (p.includes('instagram')) IconComp = FaInstagram;
+  if (p.includes('discord')) IconComp = FaDiscord;
+  if (p === 'x' || p.includes('xtwitter') || p.includes('twitter')) IconComp = FaTwitter;
+  return (
+    <Box
+      as="a"
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      borderWidth="1px"
+      borderRadius="0"
+      px={2}
+      py={1}
+      _hover={{ bg: 'whiteAlpha.100' }}
+      aria-label={label}
+    >
+      <Icon as={IconComp} verticalAlign="text-bottom" mr={2} />
+      <Text as="span" fontSize="xs" color="gray.300" textTransform="capitalize">
+        {platform}
+      </Text>
+    </Box>
+  );
 }
