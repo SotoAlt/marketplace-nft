@@ -3,12 +3,7 @@
 import { NFT_CONTRACTS, type NftContract } from '@/consts/nft_contracts';
 import { client } from '@/consts/client';
 import { Link } from '@chakra-ui/next-js';
-import {
-  Box,
-  Flex,
-  Heading,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { getContract } from 'thirdweb';
 import { getContractMetadata } from 'thirdweb/extensions/common';
 import { MediaRenderer, useReadContract } from 'thirdweb/react';
@@ -46,8 +41,7 @@ function CollectionCard({ item }: { item: NftContract }) {
 
   const { data: rawMetadata } = useReadContract(getContractMetadata, {
     contract,
-    queryOptions: {
-    },
+    queryOptions: {},
   });
 
   const metadata = rawMetadata as

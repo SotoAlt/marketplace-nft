@@ -33,7 +33,8 @@ export const NFT_CONTRACTS: NftContract[] = [
     chain: plasmaTestnet,
     title: 'Plasma Testnet Drop NFT test collection',
     description: 'Plasma Testnet Drop NFT test collection on Plasma Testnet',
-    thumbnailUrl: 'https://d391b93f5f62d9c15f67142e43841acc.ipfscdn.io/ipfs/QmRqHh9fxeoezmhaGHEFWAwWshmkttUJgaK3PBtuBLPggR/SCR-20250117-td9.jpeg', // You can update this with your actual logo
+    thumbnailUrl:
+      'https://d391b93f5f62d9c15f67142e43841acc.ipfscdn.io/ipfs/QmRqHh9fxeoezmhaGHEFWAwWshmkttUJgaK3PBtuBLPggR/SCR-20250117-td9.jpeg', // You can update this with your actual logo
     slug: 'plasma-testnet-drop-nft-test-collection',
     type: 'ERC721',
   },
@@ -54,5 +55,5 @@ export const NFT_CONTRACTS: NftContract[] = [
     thumbnailUrl: '/plasmagirl-logo.png', // You can update this with your actual logo
     slug: 'sepolia-nft-drop-collection',
     type: 'ERC721',
-  }
+  },
 ];
