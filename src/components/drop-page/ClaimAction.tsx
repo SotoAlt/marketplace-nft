@@ -131,6 +131,7 @@ export function ClaimAction({
     <Button
       colorScheme="purple"
       height="56px"
+      borderRadius="0"
       onClick={onClick}
       isLoading={isLoading}
       isDisabled={isDisabled || !onClick}
