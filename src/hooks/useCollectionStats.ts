@@ -73,7 +73,7 @@ export function useCollectionStats(): CollectionStats {
   const chainDecimals = nftContract.chain.nativeCurrency?.decimals ?? 18;
   const nativeSymbol = nftContract.chain.nativeCurrency?.symbol ?? '';
   const { data: saleEvents, isLoading: loadingSales } = useContractEvents({
-    contract: marketplaceContract,
+    contract: marketplaceContract!,
     blockRange: 200000,
     events: [newSaleEvent({ assetContract: nftContract.address })],
     enabled: !!marketplaceContract && !!nftContract,

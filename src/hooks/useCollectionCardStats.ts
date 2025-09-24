@@ -41,12 +41,11 @@ export function useCollectionCardStats(item: NftContract): CollectionCardStats {
 
   // Get all listings for this collection
   const { data: allListings, isLoading: loadingListings } = useReadContract(getAllValidListings, {
-    contract: marketplaceContract,
+    contract: marketplaceContract!,
     start: 0,
-    count: 100, // Limit to first 100 listings for performance
+    count: 100n, // Limit to first 100 listings for performance
     queryOptions: {
       enabled: !!marketplaceContract,
-      staleTime: 30000, // Cache for 30 seconds
     },
   });
 
@@ -84,14 +83,11 @@ export function useCollectionCardStats(item: NftContract): CollectionCardStats {
   const nativeSymbol = nftContract.chain.nativeCurrency?.symbol ?? 'ETH';
 
   const { data: saleEvents, isLoading: loadingSales } = useContractEvents({
-    contract: marketplaceContract,
+    contract: marketplaceContract!,
     blockRange: 100000, // Look back 100k blocks for performance
     events: marketplaceContract ? [newSaleEvent({ assetContract: nftContract.address })] : [],
     enabled: !!marketplaceContract && !!nftContract,
     watch: false,
-    queryOptions: {
-      staleTime: 60000, // Cache for 1 minute
-    },
   });
 
   const volumeDisplay = useMemo(() => {
