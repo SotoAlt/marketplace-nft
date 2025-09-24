@@ -1,4 +1,4 @@
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import { Link } from '@chakra-ui/next-js';
 import {
@@ -52,7 +52,10 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
               minW={250}
             >
               <Flex direction="column">
-                <MediaRenderer client={client} src={item.asset.metadata.image} />
+                <MediaRenderer
+                  client={client}
+                  src={item.asset.metadata.image || NFT_PLACEHOLDER_IMAGE}
+                />
                 <Text>{item.asset.metadata?.name ?? 'Unknown item'}</Text>
                 <Text>Price</Text>
                 <Text>

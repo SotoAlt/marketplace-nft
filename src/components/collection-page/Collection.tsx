@@ -1,16 +1,27 @@
+'use client';
 import { MediaRenderer, useReadContract } from 'thirdweb/react';
 import { getNFT as getNFT721 } from 'thirdweb/extensions/erc721';
 import { getNFT as getNFT1155 } from 'thirdweb/extensions/erc1155';
-import { client } from '@/consts/client';
-import { Box, Flex, Heading, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
-import { useState } from 'react';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
+import {
+  Box,
+  Flex,
+  Heading,
+  HStack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+} from '@chakra-ui/react';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import { ListingGrid } from './ListingGrid';
 import { AllNftsGrid } from './AllNftsGrid';
+import { CollectionStats } from './CollectionStats';
+import { shortenAddress } from 'thirdweb/utils';
 
 export function Collection() {
-  // `0` is Listings, `1` is `Auctions`
-  const [tabIndex, setTabIndex] = useState<number>(0);
   const {
     type,
     nftContract,
@@ -32,54 +43,77 @@ export function Collection() {
     }
   );
 
-  const thumbnailImage = contractMetadata?.image || firstNFT?.metadata.image || '';
+  const thumbnailImage =
+    contractMetadata?.image || firstNFT?.metadata.image || NFT_PLACEHOLDER_IMAGE;
   return (
-    <>
-      <Box mt="24px">
-        <Flex direction="column" gap="4">
-          <MediaRenderer
-            client={client}
-            src={thumbnailImage}
-            style={{
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              borderRadius: '20px',
-              width: '200px',
-              height: '200px',
-            }}
-          />
-          <Heading mx="auto">{contractMetadata?.name || 'Unknown collection'}</Heading>
-          {contractMetadata?.description && (
-            <Text maxW={{ lg: '500px', base: '300px' }} mx="auto" textAlign="center">
-              {contractMetadata.description}
-            </Text>
-          )}
-
-          <Tabs
-            variant="soft-rounded"
-            mx="auto"
-            mt="20px"
-            onChange={(index) => setTabIndex(index)}
-            isLazy
-          >
-            <TabList>
-              <Tab>Listings ({listingsInSelectedCollection.length || 0})</Tab>
-              <Tab>
-                All items{' '}
-                {supplyInfo
-                  ? `(${(supplyInfo.endTokenId - supplyInfo.startTokenId + 1n).toString()})`
-                  : ''}
-              </Tab>
-              {/* Support for English Auctions coming soon */}
-              {/* <Tab>Auctions ({allAuctions?.length || 0})</Tab> */}
-            </TabList>
-          </Tabs>
+    <Box mt="24px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
+      <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 10 }} align="stretch">
+        {/* Left: Image + Title + Description */}
+        <Flex w={{ base: 'full', md: 'fit-content' }} flexShrink={0} align="flex-start">
+          <HStack align="center" spacing={{ base: 4, md: 5 }}>
+            <Box
+              w={{ base: '64px', md: '96px' }}
+              h={{ base: '64px', md: '96px' }}
+              rounded="16px"
+              overflow="hidden"
+              bg="gray.700"
+              flexShrink={0}
+            >
+              <MediaRenderer
+                client={client}
+                src={thumbnailImage}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </Box>
+            <Flex direction="column" gap={1} minW={0}>
+              <Heading
+                size="lg"
+                lineHeight={1.1}
+                noOfLines={1}
+                textAlign={{ base: 'left', md: 'left' }}
+              >
+                {contractMetadata?.name || 'Unknown collection'}
+              </Heading>
+              <Text fontSize="sm" color="gray.400" noOfLines={1}>
+                {shortenAddress(nftContract.address)}
+              </Text>
+              {contractMetadata?.description && (
+                <Text maxW={{ base: '320px', md: '420px' }} color="gray.400" noOfLines={2}>
+                  {contractMetadata.description}
+                </Text>
+              )}
+            </Flex>
+          </HStack>
         </Flex>
-      </Box>
-      <Flex direction="column">
-        {tabIndex === 0 && <ListingGrid />}
-        {tabIndex === 1 && <AllNftsGrid />}
+
+        {/* Right: Stats aligned to the right of image */}
+        <Flex flex="1" align="flex-end">
+          <CollectionStats />
+        </Flex>
       </Flex>
-    </>
+
+      <Tabs mt="24px" isLazy>
+        <TabList>
+          <Tab>Listings ({listingsInSelectedCollection.length || 0})</Tab>
+          <Tab>
+            All items{' '}
+            {supplyInfo
+              ? `(${(supplyInfo.endTokenId - supplyInfo.startTokenId + 1n).toString()})`
+              : ''}
+          </Tab>
+          {/* Support for English Auctions coming soon */}
+          {/* <Tab>Auctions ({allAuctions?.length || 0})</Tab> */}
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            <ListingGrid />
+          </TabPanel>
+          <TabPanel>
+            <AllNftsGrid />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
   );
 }

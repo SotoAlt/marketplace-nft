@@ -1,5 +1,4 @@
-import { client } from '@/consts/client';
-import { Link } from '@chakra-ui/next-js';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import {
   Accordion,
   AccordionButton,
@@ -7,23 +6,28 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Flex,
+  Container,
+  Grid,
+  GridItem,
   Heading,
+  HStack,
+  SimpleGrid,
   Table,
   TableContainer,
+  Tag,
+  TagLabel,
   Tbody,
   Td,
   Text,
   Th,
   Thead,
   Tr,
+  VStack,
 } from '@chakra-ui/react';
-import { FaExternalLinkAlt } from 'react-icons/fa';
 import { balanceOf, getNFT as getERC1155 } from 'thirdweb/extensions/erc1155';
 import { getNFT as getERC721 } from 'thirdweb/extensions/erc721';
 import { MediaRenderer, useActiveAccount, useReadContract } from 'thirdweb/react';
 import { shortenAddress } from 'thirdweb/utils';
-import { NftAttributes } from './NftAttributes';
 import { CreateListing } from './CreateListing';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import dynamic from 'next/dynamic';
@@ -42,26 +46,16 @@ type Props = {
 };
 
 export function Token(props: Props) {
-  const {
-    type,
-    nftContract,
-    allAuctions,
-    isLoading,
-    contractMetadata,
-    isRefetchingAllListings,
-    listingsInSelectedCollection,
-  } = useMarketplaceContext();
+  const { type, nftContract, contractMetadata, listingsInSelectedCollection } =
+    useMarketplaceContext();
   const { tokenId } = props;
   const account = useActiveAccount();
 
-  const { data: nft, isLoading: isLoadingNFT } = useReadContract(
-    type === 'ERC1155' ? getERC1155 : getERC721,
-    {
-      tokenId: BigInt(tokenId),
-      contract: nftContract,
-      includeOwner: true,
-    }
-  );
+  const { data: nft } = useReadContract(type === 'ERC1155' ? getERC1155 : getERC721, {
+    tokenId: BigInt(tokenId),
+    contract: nftContract,
+    includeOwner: true,
+  });
 
   const { data: ownedQuantity1155 } = useReadContract(balanceOf, {
     contract: nftContract,
@@ -78,112 +72,217 @@ export function Token(props: Props) {
       item.asset.id === BigInt(tokenId)
   );
 
-  const auctions = (allAuctions || []).filter(
-    (item) =>
-      item.assetContractAddress.toLowerCase() === nftContract.address.toLowerCase() &&
-      item.asset.id === BigInt(tokenId)
-  );
-
-  const allLoaded = !isLoadingNFT && !isLoading && !isRefetchingAllListings;
-
   const ownedByYou = nft?.owner?.toLowerCase() === account?.address.toLowerCase();
 
+  const lowestPriceListing =
+    listings.length > 0
+      ? listings.reduce((lowest, current) => {
+          const currentPrice = parseFloat(current.currencyValuePerToken.displayValue);
+          const lowestPrice = parseFloat(lowest.currencyValuePerToken.displayValue);
+          return currentPrice < lowestPrice ? current : lowest;
+        })
+      : null;
+
   return (
-    <Flex direction="column">
-      <Box mt="24px" mx="auto">
-        <Flex
-          direction={{ lg: 'row', base: 'column' }}
-          justifyContent={{ lg: 'center', base: 'space-between' }}
-          gap={{ lg: 20, base: 5 }}
-        >
-          <Flex direction="column" w={{ lg: '45vw', base: '90vw' }} gap="5">
-            <MediaRenderer
-              client={client}
-              src={nft?.metadata.image}
-              style={{ width: 'max-content', height: 'auto', aspectRatio: '1' }}
-            />
-            <Accordion allowMultiple defaultIndex={[0, 1, 2]}>
+    <Container maxW="7xl" py={8} minH="100vh">
+      <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={8} alignItems="start">
+        {/* Left Column - NFT Image & Info */}
+        <GridItem>
+          <VStack spacing={6} align="stretch">
+            {/* NFT Image */}
+            <Box bg="gray.900" p={0} overflow="hidden">
+              <Box position="relative">
+                <MediaRenderer
+                  client={client}
+                  src={nft?.metadata.image || NFT_PLACEHOLDER_IMAGE}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    aspectRatio: '1',
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* Accordion Sections */}
+            <Accordion allowMultiple defaultIndex={[0, 1, 2]} allowToggle>
+              {/* Description */}
               {nft?.metadata.description && (
-                <AccordionItem>
-                  <Text>
-                    <AccordionButton>
-                      <Box as="span" flex="1" textAlign="left">
-                        Description
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                  </Text>
-                  <AccordionPanel pb={4}>
+                <AccordionItem bg="gray.900" border="1px" borderColor="gray.700" mb={2}>
+                  <AccordionButton _hover={{ bg: 'gray.800' }} py={4}>
+                    <Box as="span" flex="1" textAlign="left" fontWeight="semibold" color="white">
+                      Description
+                    </Box>
+                    <AccordionIcon color="white" />
+                  </AccordionButton>
+                  <AccordionPanel pb={4} color="gray.300">
                     <Text>{nft.metadata.description}</Text>
                   </AccordionPanel>
                 </AccordionItem>
               )}
 
-              {Array.isArray(nft?.metadata?.attributes) &&
-                nft.metadata.attributes.length > 0 && (
-                  <NftAttributes attributes={nft.metadata.attributes} />
-                )}
+              {/* Traits */}
+              {Array.isArray(nft?.metadata?.attributes) && nft.metadata.attributes.length > 0 && (
+                <AccordionItem bg="gray.900" border="1px" borderColor="gray.700" mb={2}>
+                  <AccordionButton _hover={{ bg: 'gray.800' }} py={4}>
+                    <Box as="span" flex="1" textAlign="left" fontWeight="semibold" color="white">
+                      Traits {nft.metadata.attributes.filter((attr: any) => attr.trait_type).length}
+                    </Box>
+                    <AccordionIcon color="white" />
+                  </AccordionButton>
+                  <AccordionPanel pb={4}>
+                    <SimpleGrid columns={{ base: 2, md: 3 }} spacing={3}>
+                      {nft.metadata.attributes
+                        .filter((attr: any) => attr.trait_type)
+                        .map((attr: any) => (
+                          <Box
+                            key={attr.trait_type}
+                            bg="gray.800"
+                            border="1px"
+                            borderColor="gray.600"
+                            p={3}
+                          >
+                            <Text fontSize="xs" color="gray.400" mb={1}>
+                              {attr.trait_type}
+                            </Text>
+                            <Text fontSize="sm" fontWeight="bold" color="white">
+                              {String(attr.value)}
+                            </Text>
+                          </Box>
+                        ))}
+                    </SimpleGrid>
+                  </AccordionPanel>
+                </AccordionItem>
+              )}
 
-              {nft && <NftDetails nft={nft} />}
+              {/* Details */}
+              {nft && (
+                <AccordionItem bg="gray.900" border="1px" borderColor="gray.700">
+                  <AccordionButton _hover={{ bg: 'gray.800' }} py={4}>
+                    <Box as="span" flex="1" textAlign="left" fontWeight="semibold" color="white">
+                      Details
+                    </Box>
+                    <AccordionIcon color="white" />
+                  </AccordionButton>
+                  <AccordionPanel pb={4}>
+                    <NftDetails nft={nft} />
+                  </AccordionPanel>
+                </AccordionItem>
+              )}
             </Accordion>
-          </Flex>
-          <Box w={{ lg: '45vw', base: '90vw' }}>
-            <Text>Collection</Text>
-            <Flex direction="row" gap="3">
-              <Heading>{contractMetadata?.name}</Heading>
-              <Link
-                color="gray"
-                href={`/collection/${nftContract.chain.id}/${nftContract.address}`}
-              >
-                <FaExternalLinkAlt size={20} />
-              </Link>
-            </Flex>
-            <br />
-            <Text># {nft?.id.toString()}</Text>
-            <Heading>{nft?.metadata.name}</Heading>
-            <br />
-            {type === 'ERC1155' ? (
-              <>
-                {account && ownedQuantity1155 && (
-                  <>
-                    <Text>You own</Text>
-                    <Heading>{ownedQuantity1155.toString()}</Heading>
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                <Text>Current owner</Text>
-                <Flex direction="row">
-                  <Heading>{nft?.owner ? shortenAddress(nft.owner) : 'N/A'} </Heading>
-                  {ownedByYou && <Text color="gray">(You)</Text>}
-                </Flex>
-              </>
+          </VStack>
+        </GridItem>
+
+        {/* Right Column - Token Info & Actions */}
+        <GridItem>
+          <VStack spacing={6} align="stretch">
+            {/* Collection Info */}
+            <Box>
+              <Text fontSize="sm" color="gray.400">
+                Collection
+              </Text>
+              <Heading size="md" color="white" mb={4}>
+                {contractMetadata?.name}
+              </Heading>
+            </Box>
+
+            {/* Token Name & ID */}
+            <Box>
+              <Text fontSize="sm" color="gray.400" mb={1}>
+                #{nft?.id.toString()}
+              </Text>
+              <Heading size="lg" color="white" mb={6}>
+                {nft?.metadata.name}
+              </Heading>
+            </Box>
+
+            {/* Best Price Section */}
+            {lowestPriceListing && (
+              <Box bg="gray.900" border="1px" borderColor="gray.700" p={4}>
+                <Text fontSize="sm" color="gray.400" mb={2}>
+                  Best Price
+                </Text>
+                <HStack justify="space-between" align="center">
+                  <VStack align="start" spacing={0}>
+                    <Heading size="lg" color="white">
+                      {lowestPriceListing.currencyValuePerToken.displayValue}
+                    </Heading>
+                    <Text fontSize="sm" color="gray.400">
+                      {lowestPriceListing.currencyValuePerToken.symbol}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
             )}
+
+            {/* Owner Info */}
+            <Box bg="gray.900" border="1px" borderColor="gray.700" p={4}>
+              {type === 'ERC1155' ? (
+                account &&
+                ownedQuantity1155 && (
+                  <>
+                    <Text fontSize="sm" color="gray.400" mb={2}>
+                      You own
+                    </Text>
+                    <Heading size="md" color="white">
+                      {ownedQuantity1155.toString()}
+                    </Heading>
+                  </>
+                )
+              ) : (
+                <>
+                  <Text fontSize="sm" color="gray.400" mb={2}>
+                    Owned by
+                  </Text>
+                  <HStack>
+                    <Heading size="md" color="white">
+                      {nft?.owner ? shortenAddress(nft.owner) : 'N/A'}
+                    </Heading>
+                    {ownedByYou && (
+                      <Tag colorScheme="blue" size="sm">
+                        <TagLabel>You</TagLabel>
+                      </Tag>
+                    )}
+                  </HStack>
+                </>
+              )}
+            </Box>
+
+            {/* Create Listing */}
             {account && nft && (ownedByYou || (ownedQuantity1155 && ownedQuantity1155 > 0n)) && (
               <CreateListing tokenId={nft?.id} account={account} />
             )}
-            <Accordion mt="30px" sx={{ container: {} }} defaultIndex={[0, 1]} allowMultiple>
-              <AccordionItem>
-                <Text>
-                  <AccordionButton>
-                    <Box as="span" flex="1" textAlign="left">
-                      Listings ({listings.length})
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </Text>
+
+            {/* Listings & Offers */}
+            <Accordion allowMultiple defaultIndex={[0]} allowToggle>
+              <AccordionItem bg="gray.900" border="1px" borderColor="gray.700">
+                <AccordionButton _hover={{ bg: 'gray.800' }} py={4}>
+                  <Box as="span" flex="1" textAlign="left" fontWeight="semibold" color="white">
+                    Listings ({listings.length})
+                  </Box>
+                  <AccordionIcon color="white" />
+                </AccordionButton>
                 <AccordionPanel pb={4}>
                   {listings.length > 0 ? (
                     <TableContainer>
-                      <Table variant="simple" sx={{ 'th, td': { borderBottom: 'none' } }}>
+                      <Table variant="simple" size="sm">
                         <Thead>
                           <Tr>
-                            <Th>Price</Th>
-                            {type === 'ERC1155' && <Th px={1}>Qty</Th>}
-                            <Th>Expiration</Th>
-                            <Th px={1}>From</Th>
-                            <Th>{''}</Th>
+                            <Th color="gray.400" borderColor="gray.700">
+                              Price
+                            </Th>
+                            {type === 'ERC1155' && (
+                              <Th color="gray.400" borderColor="gray.700">
+                                Qty
+                              </Th>
+                            )}
+                            <Th color="gray.400" borderColor="gray.700">
+                              Expiration
+                            </Th>
+                            <Th color="gray.400" borderColor="gray.700">
+                              From
+                            </Th>
+                            <Th color="gray.400" borderColor="gray.700"></Th>
                           </Tr>
                         </Thead>
                         <Tbody>
@@ -192,30 +291,29 @@ export function Token(props: Props) {
                               item.creatorAddress.toLowerCase() === account?.address.toLowerCase();
                             return (
                               <Tr key={item.id.toString()}>
-                                <Td>
-                                  <Text>
+                                <Td borderColor="gray.700">
+                                  <Text color="white" fontWeight="semibold">
                                     {item.currencyValuePerToken.displayValue}{' '}
                                     {item.currencyValuePerToken.symbol}
                                   </Text>
                                 </Td>
                                 {type === 'ERC1155' && (
-                                  <Td px={1}>
-                                    <Text>{item.quantity.toString()}</Text>
+                                  <Td borderColor="gray.700">
+                                    <Text color="gray.300">{item.quantity.toString()}</Text>
                                   </Td>
                                 )}
-                                <Td>
-                                  <Text>{getExpiration(item.endTimeInSeconds)}</Text>
+                                <Td borderColor="gray.700">
+                                  <Text color="gray.300" fontSize="sm">
+                                    {getExpiration(item.endTimeInSeconds)}
+                                  </Text>
                                 </Td>
-                                <Td px={1}>
-                                  <Text>
-                                    {item.creatorAddress.toLowerCase() ===
-                                    account?.address.toLowerCase()
-                                      ? 'You'
-                                      : shortenAddress(item.creatorAddress)}
+                                <Td borderColor="gray.700">
+                                  <Text color="gray.300" fontSize="sm">
+                                    {listedByYou ? 'You' : shortenAddress(item.creatorAddress)}
                                   </Text>
                                 </Td>
                                 {account && (
-                                  <Td>
+                                  <Td borderColor="gray.700">
                                     {!listedByYou ? (
                                       <BuyFromListingButton account={account} listing={item} />
                                     ) : (
@@ -230,17 +328,19 @@ export function Token(props: Props) {
                       </Table>
                     </TableContainer>
                   ) : (
-                    <Text>This item is not listed for sale</Text>
+                    <Text color="gray.400">This item is not listed for sale</Text>
                   )}
                 </AccordionPanel>
               </AccordionItem>
 
-              <RelatedListings excludedListingId={listings[0]?.id ?? -1n} />
+              <Box mt={2}>
+                <RelatedListings excludedListingId={listings[0]?.id ?? -1n} />
+              </Box>
             </Accordion>
-          </Box>
-        </Flex>
-      </Box>
-    </Flex>
+          </VStack>
+        </GridItem>
+      </Grid>
+    </Container>
   );
 }
 

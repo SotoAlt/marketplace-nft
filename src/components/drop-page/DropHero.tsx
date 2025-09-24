@@ -1,6 +1,6 @@
 'use client';
 
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import type { DropContract } from '@/consts/drop_contracts';
 import { Link } from '@chakra-ui/next-js';
 import { Box, Flex, Heading, Skeleton, Stack, Text } from '@chakra-ui/react';
@@ -21,7 +21,7 @@ export function DropHero({
   sharePath: string;
   isLoading: boolean;
 }) {
-  const imageSrc = contractMetadata?.image ?? drop.thumbnailUrl;
+  const imageSrc = contractMetadata?.image ?? drop.thumbnailUrl ?? NFT_PLACEHOLDER_IMAGE;
   return (
     <Flex
       direction={{ base: 'column', md: 'row' }}
@@ -35,15 +35,11 @@ export function DropHero({
         overflow="hidden"
         borderWidth="1px"
       >
-        {imageSrc ? (
-          <MediaRenderer
-            client={client}
-            src={imageSrc}
-            style={{ height: '100%', width: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <Skeleton height="100%" />
-        )}
+        <MediaRenderer
+          client={client}
+          src={imageSrc}
+          style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+        />
       </Box>
       <Stack flex="1" spacing={4}>
         <Skeleton isLoaded={!isLoading} minH="40px">

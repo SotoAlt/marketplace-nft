@@ -1,7 +1,7 @@
 'use client';
 
 import { DROP_CONTRACTS, type DropContract } from '@/consts/drop_contracts';
-import { client } from '@/consts/client';
+import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { Link } from '@chakra-ui/next-js';
 import { Box, Card, CardBody, Flex, Heading, Text } from '@chakra-ui/react';
 import { getContract } from 'thirdweb';
@@ -57,20 +57,16 @@ function DropCard({ drop }: { drop: DropContract }) {
 
   const title = metadata?.name ?? drop.title ?? 'Drop';
   const description = metadata?.description ?? drop.description ?? '';
-  const imageSrc = metadata?.image ?? drop.thumbnailUrl ?? '';
+  const imageSrc = metadata?.image ?? drop.thumbnailUrl ?? NFT_PLACEHOLDER_IMAGE;
 
   return (
     <Card w={{ base: '100%', sm: '320px' }} borderWidth="1px" overflow="hidden">
       <Box height="200px" overflow="hidden">
-        {imageSrc ? (
-          <MediaRenderer
-            client={client}
-            src={imageSrc}
-            style={{ height: '200px', width: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : (
-          <Box height="200px" bg="gray.700" />
-        )}
+        <MediaRenderer
+          client={client}
+          src={imageSrc}
+          style={{ height: '200px', width: '100%', objectFit: 'cover', display: 'block' }}
+        />
       </Box>
       <CardBody display="flex" flexDirection="column" gap="3">
         <Heading size="md">{title}</Heading>

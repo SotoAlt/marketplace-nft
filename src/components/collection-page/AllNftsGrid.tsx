@@ -1,15 +1,14 @@
 'use client';
 
-import { client } from '@/consts/client';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
-import { Link } from '@chakra-ui/next-js';
 import { Box, Flex, SimpleGrid, useBreakpointValue, Text, Button, Select } from '@chakra-ui/react';
 import { useState } from 'react';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from 'react-icons/md';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { getNFTs as getNFTs1155 } from 'thirdweb/extensions/erc1155';
 import { getNFTs as getNFTs721 } from 'thirdweb/extensions/erc721';
-import { MediaRenderer, useReadContract } from 'thirdweb/react';
+import { useReadContract } from 'thirdweb/react';
+import { NFTCard } from './NFTCard';
 
 export function AllNftsGrid() {
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
@@ -48,20 +47,17 @@ export function AllNftsGrid() {
       <SimpleGrid columns={columns} spacing={4} p={4} mx="auto" mt="20px">
         {allNFTs && allNFTs.length > 0 ? (
           allNFTs.map((item) => (
-            <Box
+            <NFTCard
               key={item.id}
-              rounded="12px"
-              as={Link}
+              nft={{
+                id: item.id,
+                metadata: item.metadata,
+              }}
               href={`/collection/${nftContract.chain.id}/${
                 nftContract.address
               }/token/${item.id.toString()}`}
-              _hover={{ textDecoration: 'none' }}
-            >
-              <Flex direction="column">
-                <MediaRenderer client={client} src={item.metadata.image} />
-                <Text>{item.metadata?.name ?? 'Unknown item'}</Text>
-              </Flex>
-            </Box>
+              showPrice={false}
+            />
           ))
         ) : (
           <Box mx="auto">Loading...</Box>
