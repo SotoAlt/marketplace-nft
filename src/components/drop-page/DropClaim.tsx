@@ -10,7 +10,9 @@ import {
   Grid,
   GridItem,
   Heading,
+  HStack,
   Progress,
+  SimpleGrid,
   Skeleton,
   Stack,
   Tab,
@@ -30,6 +32,8 @@ import {
 import { canClaim } from 'thirdweb/extensions/erc721';
 import { toTokens } from 'thirdweb/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { resolveScheme } from 'thirdweb/storage';
+import { format, intlFormatDistance } from 'date-fns';
 
 import { MediaRenderer } from 'thirdweb/react';
 import {
@@ -189,10 +193,9 @@ export function DropClaim() {
 
   const sharePath = `/drop/${drop.chain.id}/${drop.address}`;
 
-  const maxPerWalletLabel =
-    activeClaimCondition && activeClaimCondition.quantityLimitPerWallet > 0n
-      ? `Max per wallet: ${activeClaimCondition.quantityLimitPerWallet.toString()}`
-      : null;
+  const maxPerWalletLabel = activeClaimCondition
+    ? formatMaxPerWalletLabel(activeClaimCondition.quantityLimitPerWallet)
+    : null;
 
   const canClaimNow = Boolean(eligibilityResult?.result);
 
@@ -222,6 +225,13 @@ export function DropClaim() {
     : isDropReady
       ? { label: 'Minting now', colorScheme: 'green' as const }
       : { label: 'Coming soon', colorScheme: 'yellow' as const };
+
+  // Single ticker to update countdowns in Claim Conditions UI
+  const [, setNowTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setNowTick((t) => (t + 1) % 1_000_000), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   // Attempt to extract social links from contract metadata.
   type SocialLink = { platform: string; url: string };
@@ -347,6 +357,14 @@ export function DropClaim() {
                       </Flex>
                       <Progress value={mintedPct} size="sm" borderRadius="0" colorScheme="yellow" />
                     </Box>
+                    {/* Claim Conditions (full width, above claim UI) */}
+                    <ClaimConditionsPanel
+                      claimConditions={claimConditions}
+                      currencySymbol={currencySymbol}
+                      chainDecimals={chainDecimals}
+                      phaseDeadlines={drop.phaseDeadlines}
+                      activeStartTs={activeClaimCondition?.startTimestamp}
+                    />
 
                     {/* Claim UI */}
                     <Box
@@ -482,6 +500,266 @@ function SocialIconLink({ platform, url }: { platform: string; url: string }) {
       <Text as="span" fontSize="xs" color="gray.300" textTransform="capitalize">
         {platform}
       </Text>
+    </Box>
+  );
+}
+
+// Utilities and UI for Claim Conditions
+const MAX_UINT256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935n;
+
+function formatMaxPerWalletLabel(limit: bigint) {
+  if (limit <= 0n || limit === MAX_UINT256) {
+    return 'Max per wallet: Unlimited';
+  }
+  return `Max per wallet: ${limit.toString()}`;
+}
+
+function formatCountdownShort(seconds: number) {
+  const s = Math.max(0, Math.floor(seconds));
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = Math.floor(s % 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${sec}s`;
+  return `${sec}s`;
+}
+
+function KeyValue({ label, value }: { label: string; value: string }) {
+  return (
+    <Box>
+      <Text color="gray.500" fontSize="xs" textTransform="uppercase" letterSpacing="wide" mb={0.5}>
+        {label}
+      </Text>
+      <Text fontWeight="medium" fontSize="sm">
+        {value}
+      </Text>
+    </Box>
+  );
+}
+
+function ClaimConditionsPanel({
+  claimConditions,
+  currencySymbol,
+  chainDecimals,
+  phaseDeadlines,
+  activeStartTs,
+}: {
+  claimConditions:
+    | {
+        startTimestamp: bigint;
+        maxClaimableSupply: bigint;
+        supplyClaimed: bigint;
+        quantityLimitPerWallet: bigint;
+        merkleRoot: string;
+        pricePerToken: bigint;
+        currency: string;
+        metadata: string;
+      }[]
+    | undefined;
+  currencySymbol: string;
+  chainDecimals: number;
+  phaseDeadlines?: number[];
+  activeStartTs?: bigint;
+}) {
+  const nowSec = Math.floor(Date.now() / 1000);
+  const [phaseNames, setPhaseNames] = useState<Record<number, string>>({});
+
+  console.log('claim conditions props', {
+    claimConditions,
+    phaseDeadlines,
+    activeStartTs,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    async function run() {
+      if (!claimConditions) return;
+      const entries = await Promise.all(
+        claimConditions.map(async (cond, idx) => {
+          const uri = String(cond.metadata || '');
+          // If JSON string was directly in metadata
+          if (uri.startsWith('{') || uri.startsWith('[')) {
+            try {
+              const meta = JSON.parse(uri);
+              const nm = meta?.name || meta?.phaseName || meta?.title || '';
+              return [idx, typeof nm === 'string' ? nm : ''] as const;
+            } catch {
+              return [idx, ''] as const;
+            }
+          }
+          // If ipfs/http URL -> fetch JSON
+          if (uri.startsWith('ipfs://') || uri.startsWith('http')) {
+            try {
+              const url = resolveScheme({ client, uri });
+              const res = await fetch(url);
+              if (!res.ok) return [idx, ''] as const;
+              const meta = await res.json().catch(() => undefined);
+              const nm = meta?.name || meta?.phaseName || meta?.title || '';
+              return [idx, typeof nm === 'string' ? nm : ''] as const;
+            } catch {
+              return [idx, ''] as const;
+            }
+          }
+          return [idx, ''] as const;
+        })
+      );
+      if (cancelled) return;
+      const next: Record<number, string> = {};
+      for (const [i, n] of entries) {
+        if (n && String(n).trim().length > 0) next[i] = String(n).trim();
+      }
+      setPhaseNames(next);
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [claimConditions]);
+  return (
+    <Box>
+      <Text fontWeight="semibold" mb={4}>
+        Claim Conditions
+      </Text>
+      <Stack spacing={3}>
+        {!claimConditions || claimConditions.length === 0 ? (
+          <Text color="gray.400" fontSize="sm">
+            No claim conditions configured.
+          </Text>
+        ) : (
+          claimConditions.map((cond, idx) => {
+            const start = Number(cond.startTimestamp);
+            const max = cond.maxClaimableSupply;
+            const claimed = cond.supplyClaimed;
+            const isUnlimited = max === 0n || max === MAX_UINT256;
+            const endedBySupply = !isUnlimited && claimed >= max;
+            // Status exclusivamente desde datos del contrato (no usar deadline)
+            const hasStarted = nowSec >= start;
+            const isLive = hasStarted && !endedBySupply;
+            const status = isLive ? 'Live' : !hasStarted ? 'Upcoming' : 'Ended';
+            const mintedLabel = isUnlimited
+              ? `${claimed.toString()} / ∞`
+              : `${claimed.toString()} / ${max.toString()}`;
+            const priceLabel =
+              cond.pricePerToken && cond.pricePerToken > 0n
+                ? `${toTokens(cond.pricePerToken, chainDecimals)} ${currencySymbol}`
+                : 'Free';
+            const deadline = phaseDeadlines?.[idx];
+            const remainingSec =
+              typeof deadline === 'number' && deadline > nowSec ? deadline - nowSec : 0;
+
+            // Intentar leer el nombre de fase desde cond.metadata (si es JSON)
+            let phaseName = `Phase ${idx + 1}`;
+            try {
+              if (cond.metadata) {
+                const meta = JSON.parse(String(cond.metadata));
+                if (typeof meta?.name === 'string' && meta.name.trim().length > 0) {
+                  phaseName = meta.name.trim();
+                }
+                if (typeof meta?.phaseName === 'string' && meta.phaseName.trim().length > 0) {
+                  phaseName = meta.phaseName.trim();
+                }
+              }
+            } catch {}
+
+            const perWallet = cond.quantityLimitPerWallet;
+            const perWalletLabel =
+              perWallet === 0n || perWallet === MAX_UINT256 ? '∞' : perWallet.toString();
+            const isAllowlist =
+              cond.merkleRoot && /[1-9a-f]/i.test(cond.merkleRoot.replace(/^0x/, ''));
+            const isActive =
+              typeof activeStartTs === 'bigint' && cond.startTimestamp === activeStartTs;
+            const borderProps = isActive
+              ? { borderWidth: '2px', borderColor: 'yellow.400' }
+              : { borderWidth: '1px', borderColor: 'whiteAlpha.300' };
+            const title = phaseNames[idx]?.length ? phaseNames[idx] : `Phase ${idx + 1}`;
+            const perWalletValue =
+              perWalletLabel === '∞' ? 'Unlimited' : `${perWalletLabel} / wallet`;
+            let startDisplay = '-';
+            try {
+              startDisplay = format(new Date(start * 1000), 'MMM d, yyyy, p');
+            } catch {}
+            const endsLabel = (() => {
+              if (status === 'Ended') return 'Ended';
+              if (typeof deadline !== 'number') return '-';
+              try {
+                return intlFormatDistance(new Date(deadline * 1000), new Date(), {
+                  numeric: 'auto',
+                  style: 'short',
+                });
+              } catch {
+                return formatCountdownShort(remainingSec);
+              }
+            })();
+            const accessLabel = isAllowlist ? 'Wallet WL' : 'Public';
+            return (
+              <Box key={idx} {...borderProps} p={{ base: 4, md: 5 }} bg="transparent">
+                <Flex justify="space-between" align={{ base: 'flex-start', md: 'center' }} gap={4}>
+                  <Text fontWeight="semibold" fontSize="lg">
+                    {title}
+                  </Text>
+                  <HStack spacing={2} align="center">
+                    {isAllowlist && (
+                      <Badge variant="outline" colorScheme="purple" borderRadius="full" px={3}>
+                        Allowlist
+                      </Badge>
+                    )}
+                    <Badge
+                      colorScheme={
+                        status === 'Live' ? 'green' : status === 'Upcoming' ? 'yellow' : 'gray'
+                      }
+                      borderRadius="full"
+                      px={3}
+                      py={1}
+                    >
+                      {status}
+                    </Badge>
+                  </HStack>
+                </Flex>
+
+                <Flex
+                  mt={3}
+                  direction={{ base: 'column', md: 'row' }}
+                  gap={{ base: 3, md: 6 }}
+                  justify="space-between"
+                  align={{ base: 'flex-start', md: 'center' }}
+                >
+                  <SimpleGrid columns={{ base: 2, md: 4 }} spacingX={6} spacingY={2} flex="1">
+                    <KeyValue label="Price" value={priceLabel} />
+                    <KeyValue label="Per wallet" value={perWalletValue} />
+                    <KeyValue label="Access" value={accessLabel} />
+                    <KeyValue label="Starts" value={startDisplay} />
+                  </SimpleGrid>
+                  <Flex
+                    gap={6}
+                    align="center"
+                    justify={{ base: 'flex-start', md: 'flex-end' }}
+                    flexWrap={{ base: 'wrap', md: 'nowrap' }}
+                    minW="fit-content"
+                  >
+                    <KeyValue label={status === 'Ended' ? 'Ended' : 'Ends in'} value={endsLabel} />
+                    <Box>
+                      <Text
+                        color="gray.500"
+                        fontSize="xs"
+                        textTransform="uppercase"
+                        letterSpacing="wide"
+                        mb={1}
+                      >
+                        Minted
+                      </Text>
+                      <Text fontWeight="bold" fontSize="lg">
+                        {mintedLabel}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </Flex>
+              </Box>
+            );
+          })
+        )}
+      </Stack>
     </Box>
   );
 }

@@ -41,17 +41,8 @@ export function Navbar() {
             bgClip="text"
             fontWeight="extrabold"
           >
-            {/* Replace this with your own branding */}
-            THIRDMART
+            <Image src="/remi-logo.png" alt="remi" aspectRatio={4 / 3} width="100px" />
           </Heading>
-          <Link
-            href="/drop"
-            fontWeight="semibold"
-            display={{ base: 'none', lg: 'inline-flex' }}
-            _hover={{ textDecoration: 'none' }}
-          >
-            Drops
-          </Link>
         </Flex>
         <Box display={{ lg: 'block', base: 'none' }}>
           <ToggleThemeButton />
