@@ -13,7 +13,7 @@ export function Footer() {
           align={{ base: 'flex-start', md: 'center' }}
         >
           <Text fontSize="sm" fontWeight="medium">
-            © {new Date().getFullYear()} Thirdmart Marketplace. All rights reserved.
+            © {new Date().getFullYear()} remi. All rights reserved.
           </Text>
           <Text fontSize="sm">Built for curious collectors and forward-thinking creators.</Text>
         </Stack>

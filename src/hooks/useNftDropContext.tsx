@@ -240,6 +240,11 @@ export default function NftDropProvider({
     },
   };
 
+  console.log('DROP CONTRACT METADATA >>>', {
+    claimConditions,
+    activeClaimCondition,
+  });
+
   return (
     <NftDropContext.Provider value={contextValue}>
       {children}

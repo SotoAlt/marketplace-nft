@@ -6,8 +6,9 @@ import { AutoConnect } from 'thirdweb/react';
 import { client } from '@/consts/client';
 
 export const metadata: Metadata = {
-  title: 'Marketplace',
-  description: '',
+  title: 'remi NFT Marketplace',
+  description:
+    'Welcome to the remi NFT Marketplace, a platform for buying and selling NFTs. on Plasma',
 };
 
 export default function RootLayout({
