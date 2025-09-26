@@ -1,5 +1,5 @@
 'use client';
-import { MediaRenderer, useReadContract } from 'thirdweb/react';
+import { MediaRenderer, useActiveAccount, useReadContract } from 'thirdweb/react';
 import { getNFT as getNFT721 } from 'thirdweb/extensions/erc721';
 import { getNFT as getNFT1155 } from 'thirdweb/extensions/erc1155';
 import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
@@ -20,6 +20,8 @@ import { ListingGrid } from './ListingGrid';
 import { AllNftsGrid } from './AllNftsGrid';
 import { CollectionStats } from './CollectionStats';
 import { shortenAddress } from 'thirdweb/utils';
+import { useOwnedNfts } from '@/hooks/useOwnedNfts';
+import { OwnedNftsPanel } from './OwnedNftsPanel';
 
 export function Collection() {
   const {
@@ -30,6 +32,12 @@ export function Collection() {
     listingsInSelectedCollection,
     supplyInfo,
   } = useMarketplaceContext();
+  const account = useActiveAccount();
+  const { data: ownedNfts, isLoading: isLoadingOwnedNfts } = useOwnedNfts({
+    contract: nftContract,
+    ownerAddress: account?.address,
+    type,
+  });
 
   // In case the collection doesn't have a thumbnail, we use the image of the first NFT
   const { data: firstNFT, isLoading: isLoadingFirstNFT } = useReadContract(
@@ -101,6 +109,7 @@ export function Collection() {
               ? `(${(supplyInfo.endTokenId - supplyInfo.startTokenId + 1n).toString()})`
               : ''}
           </Tab>
+          <Tab>Owned ({ownedNfts?.length ?? 0})</Tab>
           {/* Support for English Auctions coming soon */}
           {/* <Tab>Auctions ({allAuctions?.length || 0})</Tab> */}
         </TabList>
@@ -111,6 +120,13 @@ export function Collection() {
           </TabPanel>
           <TabPanel>
             <AllNftsGrid />
+          </TabPanel>
+          <TabPanel>
+            <OwnedNftsPanel
+              ownedNfts={ownedNfts}
+              isLoading={isLoadingOwnedNfts}
+              accountAddress={account?.address}
+            />
           </TabPanel>
         </TabPanels>
       </Tabs>
