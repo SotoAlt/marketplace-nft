@@ -22,6 +22,7 @@ import { CollectionStats } from './CollectionStats';
 import { shortenAddress } from 'thirdweb/utils';
 import { useOwnedNfts } from '@/hooks/useOwnedNfts';
 import { OwnedNftsPanel } from './OwnedNftsPanel';
+import ListingHelpDialog from '@/components/shared/ListingHelpDialog';
 
 export function Collection() {
   const {
@@ -97,6 +98,9 @@ export function Collection() {
         {/* Right: Stats aligned to the right of image */}
         <Flex flex="1" align="flex-end">
           <CollectionStats />
+          <Box ml={{ base: 0, md: 4, lg: 6 }} mr={{ base: 0, md: 4, lg: 6 }}>
+            <ListingHelpDialog />
+          </Box>
         </Flex>
       </Flex>
 

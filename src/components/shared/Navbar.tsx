@@ -45,6 +45,9 @@ export function Navbar() {
           </Heading>
         </Flex>
         <Box display={{ lg: 'block', base: 'none' }}>
+          <Button as={Link} href="/#faqs" variant="ghost" mr="10px">
+            FAQs
+          </Button>
           <ToggleThemeButton />
           {account && wallet ? (
             <ProfileButton address={account.address} wallet={wallet} />
