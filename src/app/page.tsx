@@ -31,6 +31,7 @@ import {
 } from 'thirdweb/extensions/erc721';
 import { MediaRenderer, useReadContract } from 'thirdweb/react';
 import { useMemo } from 'react';
+import Faqs from '@/components/shared/Faqs';
 import { useCollectionCardStats } from '@/hooks/useCollectionCardStats';
 
 export default function Home() {
@@ -109,6 +110,10 @@ export default function Home() {
           )}
         </VStack>
       </VStack>
+
+      <Divider my={12} />
+      {/* FAQs */}
+      <Faqs />
     </Container>
   );
 }

@@ -1,17 +1,13 @@
-import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
-import { Link } from '@chakra-ui/next-js';
 import {
   AccordionButton,
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
   Box,
-  Flex,
   Text,
 } from '@chakra-ui/react';
-import { toEther } from 'thirdweb';
-import { MediaRenderer } from 'thirdweb/react';
+import { NFTCard } from '@/components/collection-page/NFTCard';
 
 export default function RelatedListings({ excludedListingId }: { excludedListingId: bigint }) {
   const { nftContract, allValidListings } = useMarketplaceContext();
@@ -32,36 +28,29 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
         </AccordionButton>
       </Text>
       <AccordionPanel pb={4}>
-        <Box
-          display="flex"
-          overflowX="auto"
-          whiteSpace="nowrap"
-          padding="4"
-          width="100%"
-          gap="15px"
-        >
+        <Box display="flex" overflowX="auto" width="100%" gap={4}>
           {listings?.map((item) => (
-            <Box
-              key={item.id.toString()}
-              rounded="12px"
-              as={Link}
-              href={`/collection/${nftContract.chain.id}/${
-                nftContract.address
-              }/token/${item.asset.id.toString()}`}
-              _hover={{ textDecoration: 'none' }}
-              minW={250}
-            >
-              <Flex direction="column">
-                <MediaRenderer
-                  client={client}
-                  src={item.asset.metadata.image || NFT_PLACEHOLDER_IMAGE}
-                />
-                <Text>{item.asset.metadata?.name ?? 'Unknown item'}</Text>
-                <Text>Price</Text>
-                <Text>
-                  {item.currencyValuePerToken.displayValue} {item.currencyValuePerToken.symbol}
-                </Text>
-              </Flex>
+            <Box key={item.id.toString()} borderWidth={1}>
+              <NFTCard
+                nft={{
+                  id: item.asset.id,
+                  metadata: {
+                    name: item.asset.metadata?.name,
+                    image: item.asset.metadata?.image,
+                  },
+                }}
+                containerProps={{
+                  borderWidth: 0,
+                }}
+                href={`/collection/${nftContract.chain.id}/${
+                  nftContract.address
+                }/token/${item.asset.id.toString()}`}
+                showPrice
+                price={{
+                  displayValue: item.currencyValuePerToken.displayValue,
+                  symbol: item.currencyValuePerToken.symbol,
+                }}
+              />
             </Box>
           ))}
         </Box>

@@ -55,6 +55,9 @@ export function SideMenu() {
               <Link href="/drop" onClick={onClose}>
                 Drops
               </Link>
+              <Link href="/#faqs" onClick={onClose}>
+                FAQs
+              </Link>
               {account && (
                 <Link href="/profile" onClick={onClose}>
                   Profile {ensName ? `(${ensName})` : ''}

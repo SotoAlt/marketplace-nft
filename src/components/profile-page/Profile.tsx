@@ -19,15 +19,14 @@ import { NFT_CONTRACTS, type NftContract } from '@/consts/nft_contracts';
 import { MediaRenderer, useActiveAccount, useReadContract } from 'thirdweb/react';
 import { getContract, toEther } from 'thirdweb';
 import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
-import { getOwnedERC721s } from '@/extensions/getOwnedERC721s';
 import { OwnedItem } from './OwnedItem';
 import { getAllValidListings } from 'thirdweb/extensions/marketplace';
 import { MARKETPLACE_CONTRACTS } from '@/consts/marketplace_contract';
 import { Link } from '@chakra-ui/next-js';
-import { getOwnedERC1155s } from '@/extensions/getOwnedERC1155s';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { useGetENSAvatar } from '@/hooks/useGetENSAvatar';
 import { useGetENSName } from '@/hooks/useGetENSName';
+import { useOwnedNfts } from '@/hooks/useOwnedNfts';
 
 type Props = {
   address: string;
@@ -47,17 +46,10 @@ export function ProfileSection(props: Props) {
     client,
   });
 
-  const {
-    data,
-    error,
-    isLoading: isLoadingOwnedNFTs,
-  } = useReadContract(selectedCollection.type === 'ERC1155' ? getOwnedERC1155s : getOwnedERC721s, {
+  const { data: ownedNfts, isLoading: isLoadingOwnedNFTs } = useOwnedNfts({
     contract,
-    owner: address,
-    requestPerSec: 50,
-    queryOptions: {
-      enabled: !!address,
-    },
+    ownerAddress: address,
+    type: selectedCollection.type,
   });
 
   const chain = contract.chain;
@@ -74,7 +66,7 @@ export function ProfileSection(props: Props) {
     getAllValidListings,
     {
       contract: marketplaceContract,
-      queryOptions: { enabled: data && data.length > 0 },
+      queryOptions: { enabled: ownedNfts && ownedNfts.length > 0 },
     }
   );
   const listings = allValidListings?.length
@@ -119,7 +111,7 @@ export function ProfileSection(props: Props) {
                   defaultIndex={0}
                 >
                   <TabList>
-                    <Tab>Owned ({data?.length})</Tab>
+                    <Tab>Owned ({ownedNfts?.length ?? 0})</Tab>
                     <Tab>Listings ({listings.length || 0})</Tab>
                     {/* <Tab>Auctions ({allAuctions?.length || 0})</Tab> */}
                   </TabList>
@@ -134,9 +126,9 @@ export function ProfileSection(props: Props) {
               <SimpleGrid columns={columns} spacing={4} p={4}>
                 {tabIndex === 0 ? (
                   <>
-                    {data && data.length > 0 ? (
+                    {ownedNfts && ownedNfts.length > 0 ? (
                       <>
-                        {data?.map((item) => (
+                        {ownedNfts.map((item) => (
                           <OwnedItem key={item.id.toString()} nftCollection={contract} nft={item} />
                         ))}
                       </>

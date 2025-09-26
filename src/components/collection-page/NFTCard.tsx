@@ -17,9 +17,10 @@ interface NFTCardProps {
     displayValue: string;
     symbol: string;
   };
+  containerProps?: any;
 }
 
-export function NFTCard({ nft, href, showPrice = false, price }: NFTCardProps) {
+export function NFTCard({ nft, href, showPrice = false, price, containerProps }: NFTCardProps) {
   return (
     <Box
       as={Link}
@@ -37,6 +38,7 @@ export function NFTCard({ nft, href, showPrice = false, price }: NFTCardProps) {
       boxShadow="md"
       maxW="280px"
       w="full"
+      {...containerProps}
     >
       <MediaRenderer
         client={client}
