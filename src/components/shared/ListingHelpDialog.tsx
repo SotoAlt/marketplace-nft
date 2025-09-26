@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { LISTING_GUIDE } from "@/consts/documentation";
+import { LISTING_GUIDE } from '@/consts/documentation';
 import {
   Badge,
   Box,
@@ -17,17 +17,17 @@ import {
   Text,
   UnorderedList,
   useDisclosure,
-} from "@chakra-ui/react";
-import { InfoIcon } from "@chakra-ui/icons";
+} from '@chakra-ui/react';
+import { InfoIcon } from '@chakra-ui/icons';
 
 type Props = {
   label?: string; // Trigger label
-  size?: "sm" | "md" | "lg"; // Trigger size
+  size?: 'sm' | 'md' | 'lg'; // Trigger size
   asBadge?: boolean; // Render trigger like a Badge-style button
 };
 
 export function ListingHelpDialog(props: Props) {
-  const { label = "How to list?", size = "sm", asBadge = true } = props;
+  const { label = 'How to list?', size = 'sm', asBadge = true } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const Trigger = (
@@ -35,8 +35,8 @@ export function ListingHelpDialog(props: Props) {
       onClick={onOpen}
       size={size}
       leftIcon={<InfoIcon />}
-      variant={asBadge ? "outline" : "solid"}
-      colorScheme={asBadge ? "blue" : "purple"}
+      variant={asBadge ? 'outline' : 'solid'}
+      colorScheme={asBadge ? 'blue' : 'purple'}
     >
       {label}
     </Button>
@@ -108,7 +108,14 @@ export function ListingHelpDialog(props: Props) {
             {LISTING_GUIDE.links?.length ? (
               <HStack mt={6} spacing={4} wrap="wrap">
                 {LISTING_GUIDE.links.map((l) => (
-                  <Button key={l.href} as="a" href={l.href} size="sm" variant="link" colorScheme="purple">
+                  <Button
+                    key={l.href}
+                    as="a"
+                    href={l.href}
+                    size="sm"
+                    variant="link"
+                    colorScheme="purple"
+                  >
                     {l.label}
                   </Button>
                 ))}
@@ -122,4 +129,3 @@ export function ListingHelpDialog(props: Props) {
 }
 
 export default ListingHelpDialog;
-

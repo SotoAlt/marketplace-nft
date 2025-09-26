@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { FAQS } from "@/consts/documentation";
+import { FAQS } from '@/consts/documentation';
 import {
   Accordion,
   AccordionButton,
@@ -12,7 +12,7 @@ import {
   Text,
   VStack,
   Container,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
 export function Faqs() {
   return (
@@ -23,11 +23,11 @@ export function Faqs() {
             FAQs
           </Heading>
         </Box>
-        <Accordion allowMultiple defaultIndex={[0]}> 
+        <Accordion allowMultiple defaultIndex={[0]}>
           {FAQS.map((item) => (
             <AccordionItem key={item.id} bg="gray.900" border="1px" borderColor="gray.700" mb={2}>
               <h3>
-                <AccordionButton _hover={{ bg: "gray.800" }} py={4}>
+                <AccordionButton _hover={{ bg: 'gray.800' }} py={4}>
                   <Box as="span" flex="1" textAlign="left" fontWeight="semibold" color="white">
                     {item.question}
                   </Box>
@@ -39,7 +39,14 @@ export function Faqs() {
                 {item.links?.length ? (
                   <Box>
                     {item.links.map((l) => (
-                      <Text as="a" key={l.href} href={l.href} color="purple.300" display="inline-block" mr={4}>
+                      <Text
+                        as="a"
+                        key={l.href}
+                        href={l.href}
+                        color="purple.300"
+                        display="inline-block"
+                        mr={4}
+                      >
                         {l.label}
                       </Text>
                     ))}
@@ -55,4 +62,3 @@ export function Faqs() {
 }
 
 export default Faqs;
-

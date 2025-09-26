@@ -91,8 +91,7 @@ export type ListingGuideStep = {
 export const LISTING_GUIDE = {
   // Optional: short title and intro used by the dialog header/body
   title: 'How to Create a Listing',
-  intro:
-    'Follow these quick steps to list your NFT so others can buy it on this marketplace.',
+  intro: 'Follow these quick steps to list your NFT so others can buy it on this marketplace.',
   // Pre-requisites shown as bullets
   prerequisites: [
     'Connect your wallet on the top-right.',
@@ -146,4 +145,3 @@ export const LISTING_GUIDE = {
 // - If you add a new route, surface it in links where helpful.
 // - Prefer neutral terms: “mint/claim”, “list”, “buy” to reduce confusion.
 // - When changing marketplace behavior, review approvals and token notes here.
-
