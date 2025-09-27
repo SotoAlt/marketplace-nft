@@ -44,13 +44,18 @@ export function OwnedNftsPanel(props: Props) {
   }
 
   return (
-    <Box p={4}>
+    <Box>
       <Text mb={3} fontSize="sm" color="gray.400">
         Tip: Open a token detail and choose &quot;List for sale&quot; to create a listing.
       </Text>
       <SimpleGrid columns={columns} spacing={4}>
         {ownedNfts.map((nft) => (
-          <OwnedItem key={nft.id.toString()} nftCollection={nftContract} nft={nft} />
+          <OwnedItem
+            key={nft.id.toString()}
+            nftCollection={nftContract}
+            nft={nft}
+            actionButtonLabel="SELL"
+          />
         ))}
       </SimpleGrid>
     </Box>

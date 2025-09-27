@@ -57,7 +57,7 @@ export function CreateListing(props: Props) {
   return (
     <>
       <br />
-      <Flex direction="column" w={{ base: '90vw', lg: '430px' }} gap="10px">
+      <Flex direction="column" w={{ base: '90vw', lg: '100%' }} gap="10px">
         {type === 'ERC1155' ? (
           <>
             <Flex direction="row" flexWrap="wrap" justifyContent="space-between">

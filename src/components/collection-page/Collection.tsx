@@ -16,7 +16,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
-import { ListingGrid } from './ListingGrid';
+import { ListingsTabContent } from './ListingsTabContent';
 import { AllNftsGrid } from './AllNftsGrid';
 import { CollectionStats } from './CollectionStats';
 import { shortenAddress } from 'thirdweb/utils';
@@ -29,6 +29,7 @@ export function Collection() {
     type,
     nftContract,
     isLoading,
+    isCheckingType,
     contractMetadata,
     listingsInSelectedCollection,
     supplyInfo,
@@ -38,6 +39,7 @@ export function Collection() {
     contract: nftContract,
     ownerAddress: account?.address,
     type,
+    enabled: !isCheckingType,
   });
 
   // In case the collection doesn't have a thumbnail, we use the image of the first NFT
@@ -47,7 +49,7 @@ export function Collection() {
       contract: nftContract,
       tokenId: 0n,
       queryOptions: {
-        enabled: isLoading || !!contractMetadata?.image,
+        enabled: !isCheckingType && !contractMetadata?.image,
       },
     }
   );
@@ -104,7 +106,7 @@ export function Collection() {
         </Flex>
       </Flex>
 
-      <Tabs mt="24px" isLazy>
+      <Tabs mt={12} variant={"enclosed-colored"} isFitted isLazy defaultIndex={0}>
         <TabList>
           <Tab>Listings ({listingsInSelectedCollection.length || 0})</Tab>
           <Tab>
@@ -118,9 +120,9 @@ export function Collection() {
           {/* <Tab>Auctions ({allAuctions?.length || 0})</Tab> */}
         </TabList>
 
-        <TabPanels>
+        <TabPanels border={"1px"} borderColor="gray.700" p={0}>
           <TabPanel>
-            <ListingGrid />
+            <ListingsTabContent />
           </TabPanel>
           <TabPanel>
             <AllNftsGrid />
