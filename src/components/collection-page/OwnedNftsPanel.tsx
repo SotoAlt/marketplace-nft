@@ -44,7 +44,7 @@ export function OwnedNftsPanel(props: Props) {
   }
 
   return (
-    <Box p={4}>
+    <Box>
       <Text mb={3} fontSize="sm" color="gray.400">
         Tip: Open a token detail and choose &quot;List for sale&quot; to create a listing.
       </Text>
