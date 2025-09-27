@@ -16,7 +16,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
-import { ListingGrid } from './ListingGrid';
+import { ListingsTabContent } from './ListingsTabContent';
 import { AllNftsGrid } from './AllNftsGrid';
 import { CollectionStats } from './CollectionStats';
 import { shortenAddress } from 'thirdweb/utils';
@@ -120,7 +120,7 @@ export function Collection() {
 
         <TabPanels>
           <TabPanel>
-            <ListingGrid />
+            <ListingsTabContent />
           </TabPanel>
           <TabPanel>
             <AllNftsGrid />

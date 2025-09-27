@@ -50,7 +50,12 @@ export function OwnedNftsPanel(props: Props) {
       </Text>
       <SimpleGrid columns={columns} spacing={4}>
         {ownedNfts.map((nft) => (
-          <OwnedItem key={nft.id.toString()} nftCollection={nftContract} nft={nft} />
+          <OwnedItem
+            key={nft.id.toString()}
+            nftCollection={nftContract}
+            nft={nft}
+            actionButtonLabel="SELL"
+          />
         ))}
       </SimpleGrid>
     </Box>

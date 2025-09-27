@@ -8,6 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { NFTCard } from '@/components/collection-page/NFTCard';
+import Link from 'next/link';
 
 export default function RelatedListings({ excludedListingId }: { excludedListingId: bigint }) {
   const { nftContract, allValidListings } = useMarketplaceContext();
@@ -29,7 +30,7 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
       </Text>
       <AccordionPanel pb={4}>
         <Box display="flex" overflowX="auto" width="100%" gap={4}>
-          {listings?.map((item) => (
+          {listings.slice(0, 4)?.map((item) => (
             <Box key={item.id.toString()} borderWidth={1}>
               <NFTCard
                 nft={{
@@ -53,6 +54,9 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
               />
             </Box>
           ))}
+        </Box>
+        <Box _hover={{ textDecoration: 'underline' }} textAlign="center" mt={4}>
+          <Link href={`/collection/${nftContract.chain.id}/${nftContract.address}`}>View all</Link>
         </Box>
       </AccordionPanel>
     </AccordionItem>

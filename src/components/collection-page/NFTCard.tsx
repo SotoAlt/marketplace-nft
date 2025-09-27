@@ -1,7 +1,8 @@
 import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { Link } from '@chakra-ui/next-js';
-import { Box, Text, HStack } from '@chakra-ui/react';
+import { Box, Text, HStack, Button, type ButtonProps } from '@chakra-ui/react';
 import { MediaRenderer } from 'thirdweb/react';
+import { FiZap } from 'react-icons/fi';
 
 interface NFTCardProps {
   nft: {
@@ -18,13 +19,48 @@ interface NFTCardProps {
     symbol: string;
   };
   containerProps?: any;
+  actionButtonLabel?: string;
+  actionButtonProps?: ButtonProps;
 }
 
-export function NFTCard({ nft, href, showPrice = false, price, containerProps }: NFTCardProps) {
+export function NFTCard({
+  nft,
+  href,
+  showPrice = false,
+  price,
+  containerProps,
+  actionButtonLabel,
+  actionButtonProps,
+}: NFTCardProps) {
+  const hoverStyles = {
+    bg: 'green.400',
+    color: 'black',
+    boxShadow: '0 6px 20px rgba(72, 187, 120, 0.35)',
+  } as const;
+
+  const defaultButtonProps: ButtonProps = {
+    size: 'sm',
+    w: 'full',
+    fontWeight: 'bold',
+    rounded: 'md',
+    bg: 'purple.500',
+    color: 'white',
+    transition: 'background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
+    _groupHover: hoverStyles,
+    _hover: hoverStyles,
+  };
+
+  const buttonProps: ButtonProps = {
+    ...defaultButtonProps,
+    leftIcon: <FiZap />,
+    ...actionButtonProps,
+  };
+
   return (
     <Box
       as={Link}
       href={href}
+      role="group"
       _hover={{
         textDecoration: 'none',
         transform: 'translateY(-2px)',
@@ -38,22 +74,32 @@ export function NFTCard({ nft, href, showPrice = false, price, containerProps }:
       boxShadow="md"
       maxW="280px"
       w="full"
+      display="flex"
+      flexDirection="column"
       {...containerProps}
     >
-      <MediaRenderer
-        client={client}
-        src={nft.metadata.image || NFT_PLACEHOLDER_IMAGE}
-        style={{
-          width: '100%',
-          aspectRatio: '0.9',
-          objectFit: 'cover',
-        }}
-      />
-      <Box p={3}>
-        <Text fontWeight="bold" fontSize="lg" color="white" noOfLines={1} mb={1}>
+      <Box overflow="hidden">
+        <Box
+          transition="transform 0.3s ease"
+          transformOrigin="center"
+          _groupHover={{ transform: 'scale(1.05)' }}
+        >
+          <MediaRenderer
+            client={client}
+            src={nft.metadata.image || NFT_PLACEHOLDER_IMAGE}
+            style={{
+              width: '100%',
+              aspectRatio: '0.9',
+              objectFit: 'cover',
+            }}
+          />
+        </Box>
+      </Box>
+      <Box p={3} display="flex" flexDirection="column" gap={2}>
+        <Text fontWeight="bold" fontSize="lg" color="white" noOfLines={1}>
           {nft.metadata?.name ?? 'Unnamed NFT'}
         </Text>
-        <Text fontSize="sm" color="gray.400" mb={showPrice ? 3 : 0}>
+        <Text fontSize="sm" color="gray.400">
           #{nft.id.toString()}
         </Text>
         {showPrice && price && (
@@ -65,6 +111,11 @@ export function NFTCard({ nft, href, showPrice = false, price, containerProps }:
               {price.displayValue} {price.symbol}
             </Text>
           </HStack>
+        )}
+        {actionButtonLabel && (
+          <Button {...buttonProps} as="span">
+            {actionButtonLabel}
+          </Button>
         )}
       </Box>
     </Box>
