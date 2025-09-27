@@ -1,7 +1,7 @@
 'use client';
 
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
-import { Box, Flex, SimpleGrid, useBreakpointValue, Text, Button, Select } from '@chakra-ui/react';
+import { Box, Flex, SimpleGrid, useBreakpointValue, Text, Button } from '@chakra-ui/react';
 import { useState } from 'react';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from 'react-icons/md';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
@@ -11,7 +11,7 @@ import { useReadContract } from 'thirdweb/react';
 import { NFTCard } from './NFTCard';
 
 export function AllNftsGrid() {
-  const [itemsPerPage, setItemsPerPage] = useState<number>(20);
+  const [itemsPerPage] = useState<number>(20);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
   const { nftContract, type, supplyInfo } = useMarketplaceContext();
   const startTokenId = supplyInfo?.startTokenId ?? 0n;
@@ -46,17 +46,19 @@ export function AllNftsGrid() {
     <>
       <SimpleGrid columns={columns} spacing={4} p={4} mx="auto" mt="20px">
         {allNFTs && allNFTs.length > 0 ? (
-          allNFTs.map((item) => (
+          allNFTs.map((item, index) => (
             <NFTCard
               key={item.id}
               nft={{
                 id: item.id,
                 metadata: item.metadata,
               }}
+              contract={nftContract}
               href={`/collection/${nftContract.chain.id}/${
                 nftContract.address
               }/token/${item.id.toString()}`}
               showPrice={false}
+              index={index}
             />
           ))
         ) : (

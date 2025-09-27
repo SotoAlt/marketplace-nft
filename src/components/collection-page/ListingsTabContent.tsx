@@ -93,11 +93,7 @@ export function ListingsTabContent() {
                 <Text fontSize="sm" color="gray.400">
                   Page {currentPage + 1} of {totalPages}
                 </Text>
-                <Button
-                  size="sm"
-                  onClick={onNextPage}
-                  isDisabled={currentPage >= totalPages - 1}
-                >
+                <Button size="sm" onClick={onNextPage} isDisabled={currentPage >= totalPages - 1}>
                   <RiArrowRightSLine />
                 </Button>
               </Flex>

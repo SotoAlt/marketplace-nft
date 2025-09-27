@@ -40,6 +40,7 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
                     image: item.asset.metadata?.image,
                   },
                 }}
+                contract={nftContract}
                 containerProps={{
                   borderWidth: 0,
                 }}
