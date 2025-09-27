@@ -29,6 +29,7 @@ export function Collection() {
     type,
     nftContract,
     isLoading,
+    isCheckingType,
     contractMetadata,
     listingsInSelectedCollection,
     supplyInfo,
@@ -38,6 +39,7 @@ export function Collection() {
     contract: nftContract,
     ownerAddress: account?.address,
     type,
+    enabled: !isCheckingType,
   });
 
   // In case the collection doesn't have a thumbnail, we use the image of the first NFT
@@ -47,7 +49,7 @@ export function Collection() {
       contract: nftContract,
       tokenId: 0n,
       queryOptions: {
-        enabled: isLoading || !!contractMetadata?.image,
+        enabled: !isCheckingType && !contractMetadata?.image,
       },
     }
   );

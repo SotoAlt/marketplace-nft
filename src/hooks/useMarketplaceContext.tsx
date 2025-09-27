@@ -31,6 +31,7 @@ type TMarketplaceContext = {
   nftContract: ThirdwebContract;
   type: NftType;
   isLoading: boolean;
+  isCheckingType: boolean;
   allValidListings: DirectListing[] | undefined;
   allAuctions: EnglishAuction[] | undefined;
   contractMetadata:
@@ -152,6 +153,8 @@ export default function MarketplaceProvider({
     isLoadingValidListings ||
     isLoadingSupplyInfo;
 
+  const isCheckingType = isChecking1155 || isChecking721;
+
   const supportedTokens: Token[] =
     SUPPORTED_TOKENS.find((item) => item.chain.id === marketplaceContract.chain.id)?.tokens || [];
 
@@ -161,6 +164,7 @@ export default function MarketplaceProvider({
         marketplaceContract: marketplace,
         nftContract: contract,
         isLoading,
+        isCheckingType,
         type: is1155 ? 'ERC1155' : 'ERC721',
         allValidListings,
         allAuctions,
