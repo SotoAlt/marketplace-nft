@@ -106,7 +106,7 @@ export function Collection() {
         </Flex>
       </Flex>
 
-      <Tabs mt={12} variant={"enclosed-colored"} isFitted isLazy defaultIndex={0}>
+      <Tabs mt={12} variant={'enclosed-colored'} isFitted isLazy defaultIndex={0}>
         <TabList>
           <Tab>Listings ({listingsInSelectedCollection.length || 0})</Tab>
           <Tab>
@@ -120,7 +120,7 @@ export function Collection() {
           {/* <Tab>Auctions ({allAuctions?.length || 0})</Tab> */}
         </TabList>
 
-        <TabPanels border={"1px"} borderColor="gray.700" p={0}>
+        <TabPanels border={'1px'} borderColor="gray.700" p={0}>
           <TabPanel>
             <ListingsTabContent />
           </TabPanel>

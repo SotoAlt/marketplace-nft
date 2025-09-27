@@ -16,6 +16,7 @@ export function OwnedItem(props: OwnedItemProps) {
         id: nft.id,
         metadata: nft.metadata,
       }}
+      contract={nftCollection}
       href={`/collection/${nftCollection.chain.id}/${
         nftCollection.address
       }/token/${nft.id.toString()}`}

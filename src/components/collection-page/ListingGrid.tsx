@@ -23,13 +23,14 @@ export function ListingGrid({ listings = [] }: ListingGridProps) {
 
   return (
     <SimpleGrid columns={columns} spacing={4} p={4} mx="auto" mt="20px">
-      {listings.map((item) => (
+      {listings.map((item, index) => (
         <NFTCard
           key={item.id}
           nft={{
             id: item.asset.id,
             metadata: item.asset.metadata,
           }}
+          contract={nftContract}
           href={`/collection/${nftContract.chain.id}/${
             nftContract.address
           }/token/${item.asset.id.toString()}`}
@@ -39,6 +40,7 @@ export function ListingGrid({ listings = [] }: ListingGridProps) {
             symbol: item.currencyValuePerToken.symbol,
           }}
           actionButtonLabel="BUY"
+          index={index}
         />
       ))}
     </SimpleGrid>

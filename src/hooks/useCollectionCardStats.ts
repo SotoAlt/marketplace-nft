@@ -43,7 +43,7 @@ export function useCollectionCardStats(item: NftContract): CollectionCardStats {
   const { data: allListings, isLoading: loadingListings } = useReadContract(getAllValidListings, {
     contract: marketplaceContract!,
     start: 0,
-    count: 100n, // Limit to first 100 listings for performance
+    count: 50n, // Reduce to 50 listings for better performance
     queryOptions: {
       enabled: !!marketplaceContract,
     },
@@ -84,7 +84,7 @@ export function useCollectionCardStats(item: NftContract): CollectionCardStats {
 
   const { data: saleEvents, isLoading: loadingSales } = useContractEvents({
     contract: marketplaceContract!,
-    blockRange: 100000, // Look back 100k blocks for performance
+    blockRange: 10000, // Reduce to 10k blocks for better performance
     events: marketplaceContract ? [newSaleEvent({ assetContract: nftContract.address })] : [],
     enabled: !!marketplaceContract && !!nftContract,
     watch: false,
