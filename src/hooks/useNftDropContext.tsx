@@ -18,7 +18,7 @@ import {
   isClaimToSupported,
   isERC721,
 } from 'thirdweb/extensions/erc721';
-import { decimals, symbol } from 'thirdweb/extensions/erc20';
+import { decimals, getSymbol } from 'thirdweb/extensions/erc20';
 import { useReadContract } from 'thirdweb/react';
 import { toFunctionSelector } from 'thirdweb/utils';
 
@@ -213,7 +213,7 @@ export default function NftDropProvider({
     });
   }, [isERC20Currency, activeClaimCondition, drop.chain]);
 
-  const { data: tokenSymbol, isLoading: isLoadingSymbol } = useReadContract(symbol, {
+  const { data: tokenSymbol, isLoading: isLoadingSymbol } = useReadContract(getSymbol, {
     contract: currencyContract!,
     queryOptions: {
       enabled: !!currencyContract,

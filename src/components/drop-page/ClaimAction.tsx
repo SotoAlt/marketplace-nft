@@ -129,7 +129,7 @@ export function ClaimAction({
             const approveTransaction = approve({
               contract: tokenContract,
               spender: contract.address,
-              amount: totalPrice,
+              amount: totalPrice.toString(),
             });
             await sendAndConfirmTransaction({ transaction: approveTransaction, account });
             
