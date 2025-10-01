@@ -1,5 +1,5 @@
 import type { Chain } from 'thirdweb';
-import { avalancheFuji, polygonAmoy, sepolia } from './chains';
+import { avalancheFuji, polygonAmoy, sepolia, plasma } from './chains';
 
 export type Token = {
   tokenAddress: string;
@@ -69,6 +69,17 @@ export const SUPPORTED_TOKENS: SupportedTokens[] = [
       },
     ],
   },
+
+  {
+    chain: plasma,
+    tokens: [
+      {
+        tokenAddress: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb',
+        symbol: 'USDT0',
+        icon: '/erc20-icons/usdt.png',
+      },
+    ],
+  },
 ];
 
 export const NATIVE_TOKEN_ICON_MAP: { [key in Chain['id']]: string } = {
@@ -76,4 +87,5 @@ export const NATIVE_TOKEN_ICON_MAP: { [key in Chain['id']]: string } = {
   [sepolia.id]: '/native-token-icons/eth.png',
   [avalancheFuji.id]: '/native-token-icons/avax.png',
   [polygonAmoy.id]: '/native-token-icons/matic.png',
+  [plasma.id]: '/native-token-icons/xpl.png',
 };
