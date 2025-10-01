@@ -60,6 +60,8 @@ export function DropClaim() {
     isSoldOut,
     startsInSeconds,
     currencySymbol,
+    currencyDecimals,
+    isERC20Currency,
   } = useNftDropContext();
 
   const account = useActiveAccount();
@@ -115,10 +117,10 @@ export function DropClaim() {
     }
   }, [maxQuantityNumber, quantity]);
 
-  const chainDecimals = drop.chain.nativeCurrency?.decimals ?? 18;
+  // Use currency decimals from context instead of chain decimals
   const pricePerToken =
     activeClaimCondition?.pricePerToken && activeClaimCondition.pricePerToken > 0n
-      ? toTokens(activeClaimCondition.pricePerToken, chainDecimals)
+      ? toTokens(activeClaimCondition.pricePerToken, currencyDecimals)
       : '0';
   const pricePerTokenDisplay =
     activeClaimCondition?.pricePerToken && activeClaimCondition.pricePerToken > 0n
@@ -126,7 +128,7 @@ export function DropClaim() {
       : 'Free';
   const totalPriceDisplay =
     activeClaimCondition?.pricePerToken && activeClaimCondition.pricePerToken > 0n
-      ? toTokens(activeClaimCondition.pricePerToken * BigInt(quantity), chainDecimals)
+      ? toTokens(activeClaimCondition.pricePerToken * BigInt(quantity), currencyDecimals)
       : 'Free';
 
   const isConnected = Boolean(account);
@@ -361,7 +363,7 @@ export function DropClaim() {
                     <ClaimConditionsPanel
                       claimConditions={claimConditions}
                       currencySymbol={currencySymbol}
-                      chainDecimals={chainDecimals}
+                      chainDecimals={currencyDecimals}
                       phaseDeadlines={drop.phaseDeadlines}
                       activeStartTs={activeClaimCondition?.startTimestamp}
                     />

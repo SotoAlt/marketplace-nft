@@ -1,10 +1,12 @@
 'use client';
 
+import { client } from '@/consts/client';
 import { useNftDropContext } from '@/hooks/useNftDropContext';
 import { Button, useToast } from '@chakra-ui/react';
 import { useState } from 'react';
-import { sendAndConfirmTransaction } from 'thirdweb';
+import { sendAndConfirmTransaction, getContract } from 'thirdweb';
 import { claimTo } from 'thirdweb/extensions/erc721';
+import { allowance, approve } from 'thirdweb/extensions/erc20';
 import type { Account } from 'thirdweb/wallets';
 
 export function ClaimAction({
@@ -43,7 +45,14 @@ export function ClaimAction({
   chainName: string;
 }) {
   const toast = useToast();
-  const { contract, refetch } = useNftDropContext();
+  const { 
+    contract, 
+    refetch, 
+    isERC20Currency, 
+    currencyAddress, 
+    activeClaimCondition,
+    drop 
+  } = useNftDropContext();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
 
@@ -89,6 +98,52 @@ export function ClaimAction({
       if (!account) return;
       setIsProcessing(true);
       try {
+        // Check if ERC20 approval is needed
+        if (isERC20Currency && currencyAddress && activeClaimCondition) {
+          const tokenContract = getContract({
+            client,
+            chain: drop.chain,
+            address: currencyAddress,
+          });
+
+          // Calculate total price
+          const totalPrice = activeClaimCondition.pricePerToken * BigInt(quantity);
+
+          // Check allowance
+          const currentAllowance = await allowance({
+            contract: tokenContract,
+            owner: account.address,
+            spender: contract.address,
+          });
+
+          // Request approval if needed
+          if (currentAllowance < totalPrice) {
+            toast({
+              title: 'Approval required',
+              description: 'Approving token spending...',
+              status: 'info',
+              duration: 3000,
+              isClosable: true,
+            });
+
+            const approveTransaction = approve({
+              contract: tokenContract,
+              spender: contract.address,
+              amount: totalPrice,
+            });
+            await sendAndConfirmTransaction({ transaction: approveTransaction, account });
+            
+            toast({
+              title: 'Approval successful',
+              description: 'Now proceeding with minting...',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        }
+
+        // Proceed with claiming
         const transaction = claimTo({
           contract,
           to: account.address,
@@ -146,6 +201,12 @@ function parseClaimError(error: unknown) {
   const lower = raw.toLowerCase();
   if (lower.includes('insufficient') && lower.includes('fund')) {
     return 'Insufficient balance to cover the mint price.';
+  }
+  if (lower.includes('insufficient') && lower.includes('balance')) {
+    return 'Insufficient token balance. Please ensure you have enough USDT0 tokens.';
+  }
+  if (lower.includes('allowance') || lower.includes('approve')) {
+    return 'Token approval required. Please approve the contract to spend your tokens.';
   }
   if (lower.includes('allowlist') || lower.includes('not allowlisted')) {
     return 'Wallet is not on the allowlist for this drop.';

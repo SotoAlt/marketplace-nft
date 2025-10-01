@@ -2,11 +2,12 @@
 
 import { client } from '@/consts/client';
 import { DROP_CONTRACTS, type DropContract } from '@/consts/drop_contracts';
+import { SUPPORTED_TOKENS } from '@/consts/supported_tokens';
 import { Box, Spinner } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import type { Abi, AbiFunction } from 'abitype';
 import { type ReactNode, createContext, useContext, useMemo } from 'react';
-import { getContract, type ThirdwebContract } from 'thirdweb';
+import { getContract, type ThirdwebContract, NATIVE_TOKEN_ADDRESS } from 'thirdweb';
 import { resolveContractAbi } from 'thirdweb/contract';
 import { getContractMetadata } from 'thirdweb/extensions/common';
 import {
@@ -17,6 +18,7 @@ import {
   isClaimToSupported,
   isERC721,
 } from 'thirdweb/extensions/erc721';
+import { decimals, symbol } from 'thirdweb/extensions/erc20';
 import { useReadContract } from 'thirdweb/react';
 import { toFunctionSelector } from 'thirdweb/utils';
 
@@ -53,6 +55,9 @@ type NftDropContextValue = {
   isSoldOut: boolean;
   startsInSeconds: number | null;
   currencySymbol: string;
+  currencyAddress: string | undefined;
+  currencyDecimals: number;
+  isERC20Currency: boolean;
   refetch: {
     metadata: () => Promise<unknown>;
     activeClaimCondition: () => Promise<unknown>;
@@ -188,6 +193,40 @@ export default function NftDropProvider({
     },
   });
 
+  // Determine if we're using ERC20 currency
+  const isERC20Currency = useMemo(() => {
+    if (!activeClaimCondition) return false;
+    const currencyAddress = activeClaimCondition.currency.toLowerCase();
+    return (
+      currencyAddress !== NATIVE_TOKEN_ADDRESS.toLowerCase() &&
+      currencyAddress !== '0x0000000000000000000000000000000000000000'
+    );
+  }, [activeClaimCondition]);
+
+  // Get ERC20 token details
+  const currencyContract = useMemo(() => {
+    if (!isERC20Currency || !activeClaimCondition) return undefined;
+    return getContract({
+      client,
+      chain: drop.chain,
+      address: activeClaimCondition.currency,
+    });
+  }, [isERC20Currency, activeClaimCondition, drop.chain]);
+
+  const { data: tokenSymbol, isLoading: isLoadingSymbol } = useReadContract(symbol, {
+    contract: currencyContract!,
+    queryOptions: {
+      enabled: !!currencyContract,
+    },
+  });
+
+  const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadContract(decimals, {
+    contract: currencyContract!,
+    queryOptions: {
+      enabled: !!currencyContract,
+    },
+  });
+
   if (!isLoadingSelectors && claimSupported === false) {
     throw new Error('Drop contract does not support claimTo operations');
   }
@@ -214,7 +253,24 @@ export default function NftDropProvider({
     isLoadingActiveClaimCondition ||
     isLoadingClaimConditions ||
     isLoadingTotalClaimed ||
-    isLoadingTotalUnclaimed;
+    isLoadingTotalUnclaimed ||
+    (isERC20Currency && (isLoadingSymbol || isLoadingDecimals));
+
+  // Determine the currency symbol
+  const currencySymbol = useMemo(() => {
+    if (isERC20Currency && tokenSymbol) {
+      return tokenSymbol;
+    }
+    return drop.chain.nativeCurrency?.symbol ?? 'TOKEN';
+  }, [isERC20Currency, tokenSymbol, drop.chain.nativeCurrency]);
+
+  // Determine the currency decimals
+  const currencyDecimals = useMemo(() => {
+    if (isERC20Currency && tokenDecimals !== undefined) {
+      return Number(tokenDecimals);
+    }
+    return drop.chain.nativeCurrency?.decimals ?? 18;
+  }, [isERC20Currency, tokenDecimals, drop.chain.nativeCurrency]);
 
   const contextValue: NftDropContextValue = {
     contract,
@@ -230,7 +286,10 @@ export default function NftDropProvider({
     isDropReady,
     isSoldOut,
     startsInSeconds: startsInSeconds !== null ? Math.max(startsInSeconds, 0) : null,
-    currencySymbol: drop.chain.nativeCurrency?.symbol ?? 'TOKEN',
+    currencySymbol,
+    currencyAddress: activeClaimCondition?.currency,
+    currencyDecimals,
+    isERC20Currency,
     refetch: {
       metadata: refetchMetadata,
       activeClaimCondition: refetchActiveClaimCondition,
