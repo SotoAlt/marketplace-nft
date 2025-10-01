@@ -18,7 +18,7 @@ import {
   isClaimToSupported,
   isERC721,
 } from 'thirdweb/extensions/erc721';
-import { decimals, getSymbol } from 'thirdweb/extensions/erc20';
+import { getCurrencyMetadata } from 'thirdweb/extensions/erc20';
 import { useReadContract } from 'thirdweb/react';
 import { toFunctionSelector } from 'thirdweb/utils';
 
@@ -213,19 +213,15 @@ export default function NftDropProvider({
     });
   }, [isERC20Currency, activeClaimCondition, drop.chain]);
 
-  const { data: tokenSymbol, isLoading: isLoadingSymbol } = useReadContract(getSymbol, {
-    contract: currencyContract!,
-    queryOptions: {
-      enabled: !!currencyContract,
-    },
-  });
-
-  const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadContract(decimals, {
-    contract: currencyContract!,
-    queryOptions: {
-      enabled: !!currencyContract,
-    },
-  });
+  const { data: currencyMetadata, isLoading: isLoadingCurrencyMetadata } = useReadContract(
+    getCurrencyMetadata,
+    {
+      contract: currencyContract!,
+      queryOptions: {
+        enabled: !!currencyContract,
+      },
+    }
+  );
 
   if (!isLoadingSelectors && claimSupported === false) {
     throw new Error('Drop contract does not support claimTo operations');
@@ -254,23 +250,23 @@ export default function NftDropProvider({
     isLoadingClaimConditions ||
     isLoadingTotalClaimed ||
     isLoadingTotalUnclaimed ||
-    (isERC20Currency && (isLoadingSymbol || isLoadingDecimals));
+    (isERC20Currency && isLoadingCurrencyMetadata);
 
   // Determine the currency symbol
   const currencySymbol = useMemo(() => {
-    if (isERC20Currency && tokenSymbol) {
-      return tokenSymbol;
+    if (isERC20Currency && currencyMetadata?.symbol) {
+      return currencyMetadata.symbol;
     }
     return drop.chain.nativeCurrency?.symbol ?? 'TOKEN';
-  }, [isERC20Currency, tokenSymbol, drop.chain.nativeCurrency]);
+  }, [isERC20Currency, currencyMetadata, drop.chain.nativeCurrency]);
 
   // Determine the currency decimals
   const currencyDecimals = useMemo(() => {
-    if (isERC20Currency && tokenDecimals !== undefined) {
-      return Number(tokenDecimals);
+    if (isERC20Currency && currencyMetadata?.decimals !== undefined) {
+      return currencyMetadata.decimals;
     }
     return drop.chain.nativeCurrency?.decimals ?? 18;
-  }, [isERC20Currency, tokenDecimals, drop.chain.nativeCurrency]);
+  }, [isERC20Currency, currencyMetadata, drop.chain.nativeCurrency]);
 
   const contextValue: NftDropContextValue = {
     contract,
