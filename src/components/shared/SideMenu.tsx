@@ -66,7 +66,14 @@ export function SideMenu() {
               )}
             </Box>
             <Box>
-              <ConnectButton theme={colorMode} client={client} wallets={supportedWallets} />
+              <ConnectButton 
+                theme={colorMode} 
+                client={client} 
+                wallets={supportedWallets}
+                connectModal={{
+                  showThirdwebBranding: false,
+                }}
+              />
             </Box>
           </DrawerBody>
           <DrawerFooter>

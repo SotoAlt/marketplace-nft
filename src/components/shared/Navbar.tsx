@@ -58,6 +58,9 @@ export function Navbar() {
               wallets={supportedWallets}
               theme={colorMode}
               connectButton={{ style: { height: '56px' } }}
+              connectModal={{
+                showThirdwebBranding: false,
+              }}
             />
           )}
         </Box>
@@ -84,7 +87,14 @@ function ProfileButton({ address, wallet }: { address: string; wallet: Wallet })
       </MenuButton>
       <MenuList>
         <Box px="3" py="2">
-          <ConnectButton client={client} wallets={supportedWallets} theme={colorMode} />
+          <ConnectButton 
+            client={client} 
+            wallets={supportedWallets} 
+            theme={colorMode}
+            connectModal={{
+              showThirdwebBranding: false,
+            }}
+          />
         </Box>
         <MenuDivider />
         <MenuItem as={Link} href="/profile" _hover={{ textDecoration: 'none' }}>
