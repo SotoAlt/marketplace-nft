@@ -1,6 +1,7 @@
 'use client';
 
 import { client } from '@/consts/client';
+import { supportedWallets } from '@/consts/wallets';
 import { useGetENSAvatar } from '@/hooks/useGetENSAvatar';
 import { useGetENSName } from '@/hooks/useGetENSName';
 import { HamburgerIcon } from '@chakra-ui/icons';
@@ -65,7 +66,14 @@ export function SideMenu() {
               )}
             </Box>
             <Box>
-              <ConnectButton theme={colorMode} client={client} />
+              <ConnectButton 
+                theme={colorMode} 
+                client={client} 
+                wallets={supportedWallets}
+                connectModal={{
+                  size: 'compact',
+                }}
+              />
             </Box>
           </DrawerBody>
           <DrawerFooter>

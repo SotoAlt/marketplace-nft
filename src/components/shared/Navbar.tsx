@@ -1,6 +1,7 @@
 'use client';
 
 import { client } from '@/consts/client';
+import { supportedWallets } from '@/consts/wallets';
 import { useGetENSAvatar } from '@/hooks/useGetENSAvatar';
 import { useGetENSName } from '@/hooks/useGetENSName';
 import { Link } from '@chakra-ui/next-js';
@@ -54,8 +55,12 @@ export function Navbar() {
           ) : (
             <ConnectButton
               client={client}
+              wallets={supportedWallets}
               theme={colorMode}
               connectButton={{ style: { height: '56px' } }}
+              connectModal={{
+                size: 'compact',
+              }}
             />
           )}
         </Box>
@@ -82,7 +87,14 @@ function ProfileButton({ address, wallet }: { address: string; wallet: Wallet })
       </MenuButton>
       <MenuList>
         <Box px="3" py="2">
-          <ConnectButton client={client} theme={colorMode} />
+          <ConnectButton 
+            client={client} 
+            wallets={supportedWallets} 
+            theme={colorMode}
+            connectModal={{
+              size: 'compact',
+            }}
+          />
         </Box>
         <MenuDivider />
         <MenuItem as={Link} href="/profile" _hover={{ textDecoration: 'none' }}>
