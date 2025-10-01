@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Flex, HStack, Skeleton, Text, type BoxProps } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Skeleton, Text, Image, type BoxProps } from '@chakra-ui/react';
 import type { ReactNode } from 'react';
 
 export function ClaimControls({
@@ -11,6 +11,7 @@ export function ClaimControls({
   pricePerTokenDisplay,
   totalPriceDisplay,
   currencySymbol,
+  currencyIcon,
   eligibilityMessage,
   isCheckingEligibility,
   isSoldOut,
@@ -27,6 +28,7 @@ export function ClaimControls({
   pricePerTokenDisplay: string;
   totalPriceDisplay: string;
   currencySymbol: string;
+  currencyIcon?: string;
   eligibilityMessage: string | null;
   isCheckingEligibility: boolean;
   isSoldOut: boolean;
@@ -71,12 +73,25 @@ export function ClaimControls({
       </Box>
       <Box>
         <Text fontWeight="semibold">Price</Text>
-        <Text color="gray.400" fontSize="sm">
-          {pricePerTokenDisplay} {pricePerTokenDisplay !== 'Free' ? currencySymbol : ''} each
-        </Text>
-        <Text fontWeight="bold" mt={2}>
-          Total: {totalPriceDisplay} {totalPriceDisplay !== 'Free' ? currencySymbol : ''}
-        </Text>
+        <HStack spacing={1} color="gray.400" fontSize="sm">
+          <Text>{pricePerTokenDisplay}</Text>
+          {pricePerTokenDisplay !== 'Free' && (
+            <>
+              {currencyIcon && <Image boxSize="16px" src={currencyIcon} borderRadius="full" />}
+              <Text>{currencySymbol}</Text>
+            </>
+          )}
+          <Text>each</Text>
+        </HStack>
+        <HStack fontWeight="bold" mt={2} spacing={1}>
+          <Text>Total: {totalPriceDisplay}</Text>
+          {totalPriceDisplay !== 'Free' && (
+            <>
+              {currencyIcon && <Image boxSize="20px" src={currencyIcon} borderRadius="full" />}
+              <Text>{currencySymbol}</Text>
+            </>
+          )}
+        </HStack>
       </Box>
       <Skeleton isLoaded={!isCheckingEligibility} minH="24px">
         {eligibilityMessage && (

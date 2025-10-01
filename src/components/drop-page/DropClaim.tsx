@@ -402,6 +402,7 @@ export function DropClaim() {
                         pricePerTokenDisplay={pricePerTokenDisplay}
                         totalPriceDisplay={totalPriceDisplay}
                         currencySymbol={currencySymbol}
+                        currencyIcon={isERC20Currency ? '/erc20-icons/usdt.png' : undefined}
                         eligibilityMessage={parsedEligibilityReason}
                         isCheckingEligibility={
                           eligibilityQuery.isLoading || eligibilityQuery.isFetching

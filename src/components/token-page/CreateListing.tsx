@@ -110,7 +110,6 @@ export function CreateListing(props: Props) {
                 <>
                   <Image boxSize="2rem" borderRadius="full" src={currency.icon} />
                   <Text fontWeight="medium">{currency.symbol}</Text>
-                  <Text fontSize="sm" color="gray.500" ml="auto">Fixed</Text>
                 </>
               )}
             </HStack>
