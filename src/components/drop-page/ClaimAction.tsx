@@ -88,7 +88,12 @@ export function ClaimAction({
     buttonLabel = 'Checking eligibility...';
     isDisabled = true;
   } else if (!canClaim) {
-    buttonLabel = eligibilityReason ?? 'Not Eligible';
+    // Use shorter label for button if it's the allocation exceeded message
+    if (eligibilityReason?.includes('already minted your maximum allocation')) {
+      buttonLabel = 'Allocation Reached';
+    } else {
+      buttonLabel = eligibilityReason ?? 'Not Eligible';
+    }
     isDisabled = true;
   } else if (quantity === 0) {
     buttonLabel = 'Select quantity';
