@@ -459,6 +459,14 @@ function decodeEligibilityReason(reason: string) {
   if (lower.includes('wallet not connected')) {
     return 'Connect your wallet to continue.';
   }
+  if (lower.includes('dropclaimexceedlimit') || (lower.includes('exceed') && lower.includes('limit'))) {
+    // Try to extract numbers from the error message (e.g., "2,3" means minted 2, trying for 3rd)
+    const numbers = reason.match(/\d+/g);
+    if (numbers && numbers.length >= 1) {
+      return `You've already minted your maximum allocation (${numbers[0]} NFT${numbers[0] !== '1' ? 's' : ''}). No more mints available for this wallet.`;
+    }
+    return "You've already minted your maximum allocation for this drop.";
+  }
   if (lower.includes('allowlist') || lower.includes('not allowlisted')) {
     return 'Wallet is not on the allowlist for this drop.';
   }
