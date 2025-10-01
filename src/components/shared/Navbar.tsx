@@ -59,7 +59,7 @@ export function Navbar() {
               theme={colorMode}
               connectButton={{ style: { height: '56px' } }}
               connectModal={{
-                showThirdwebBranding: false,
+                size: 'compact',
               }}
             />
           )}
@@ -92,7 +92,7 @@ function ProfileButton({ address, wallet }: { address: string; wallet: Wallet })
             wallets={supportedWallets} 
             theme={colorMode}
             connectModal={{
-              showThirdwebBranding: false,
+              size: 'compact',
             }}
           />
         </Box>

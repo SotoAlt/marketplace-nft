@@ -71,7 +71,7 @@ export function SideMenu() {
                 client={client} 
                 wallets={supportedWallets}
                 connectModal={{
-                  showThirdwebBranding: false,
+                  size: 'compact',
                 }}
               />
             </Box>
