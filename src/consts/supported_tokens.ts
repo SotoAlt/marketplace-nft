@@ -32,7 +32,7 @@ export const SUPPORTED_TOKENS: SupportedTokens[] = [
       {
         tokenAddress: '0x82dcec6aa3c8bfe2c96d40d8805ee0da15708643',
         symbol: 'USDT',
-        icon: '/erc20-icons/usdt.png',
+        icon: '/erc20-icons/usdt0_logo.png',
       },
       // Add more ERC20 here...
     ],
@@ -49,7 +49,7 @@ export const SUPPORTED_TOKENS: SupportedTokens[] = [
       {
         tokenAddress: '0xbcf39d8616d15fd146dd5db4a86b4f244a9bc772',
         symbol: 'USDT',
-        icon: '/erc20-icons/usdt.png',
+        icon: '/erc20-icons/usdt0_logo.png',
       },
     ],
   },
@@ -65,7 +65,7 @@ export const SUPPORTED_TOKENS: SupportedTokens[] = [
       {
         tokenAddress: '0x36160274b0ed3673e67f2ca5923560a7a0c523aa',
         symbol: 'USDT',
-        icon: '/erc20-icons/usdt.png',
+        icon: '/erc20-icons/usdt0_logo.png',
       },
     ],
   },
@@ -76,7 +76,7 @@ export const SUPPORTED_TOKENS: SupportedTokens[] = [
       {
         tokenAddress: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb',
         symbol: 'USDT0',
-        icon: '/erc20-icons/usdt.png',
+        icon: '/erc20-icons/usdt0_logo.png',
       },
     ],
   },
