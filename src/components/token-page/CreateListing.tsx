@@ -1,6 +1,7 @@
 import { NATIVE_TOKEN_ICON_MAP, Token } from '@/consts/supported_tokens';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import { CheckIcon, ChevronDownIcon } from '@chakra-ui/icons';
+import { plasma } from '@/consts/chains';
 import {
   Button,
   Flex,
@@ -13,8 +14,9 @@ import {
   Image,
   useToast,
   Box,
+  HStack,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NATIVE_TOKEN_ADDRESS, sendAndConfirmTransaction } from 'thirdweb';
 import {
   isApprovedForAll as isApprovedForAll1155,
@@ -45,6 +47,21 @@ export function CreateListing(props: Props) {
   const { nftContract, marketplaceContract, refetchAllListings, type, supportedTokens } =
     useMarketplaceContext();
   const chain = marketplaceContract.chain;
+
+  const isPlasmaMainnet = chain.id === plasma.id;
+  
+  // Auto-select USDT0 for Plasma mainnet
+  useEffect(() => {
+    if (isPlasmaMainnet && supportedTokens.length > 0) {
+      // Find USDT0 token in supported tokens
+      const usdt0Token = supportedTokens.find(token => 
+        token.symbol.toUpperCase() === 'USDT0'
+      );
+      if (usdt0Token) {
+        setCurrency(usdt0Token);
+      }
+    }
+  }, [isPlasmaMainnet, supportedTokens]);
 
   const nativeToken: Token = {
     tokenAddress: NATIVE_TOKEN_ADDRESS,
@@ -77,35 +94,58 @@ export function CreateListing(props: Props) {
             <Input type="number" ref={priceRef} placeholder="Enter a price for your listing" />
           </>
         )}
-        <Menu>
-          <MenuButton minH="48px" as={Button} rightIcon={<ChevronDownIcon />}>
-            {currency ? (
-              <Flex direction="row">
-                <Image boxSize="2rem" borderRadius="full" src={currency.icon} mr="12px" />
-                <Text my="auto">{currency.symbol}</Text>
-              </Flex>
-            ) : (
-              'Select currency'
-            )}
-          </MenuButton>
-          <MenuList>
-            {options.map((token) => (
-              <MenuItem
-                minH="48px"
-                key={token.tokenAddress}
-                onClick={() => setCurrency(token)}
-                display={'flex'}
-                flexDir={'row'}
-              >
-                <Image boxSize="2rem" borderRadius="full" src={token.icon} ml="2px" mr="14px" />
-                <Text my="auto">{token.symbol}</Text>
-                {token.tokenAddress.toLowerCase() === currency?.tokenAddress.toLowerCase() && (
-                  <CheckIcon ml="auto" />
-                )}
-              </MenuItem>
-            ))}
-          </MenuList>
-        </Menu>
+        
+        {/* Show fixed USDT0 for Plasma mainnet, dropdown for other chains */}
+        {isPlasmaMainnet ? (
+          <Box>
+            <Text mb={2}>Currency</Text>
+            <HStack 
+              p={3} 
+              borderWidth="1px" 
+              borderRadius="md" 
+              bg="gray.50"
+              _dark={{ bg: 'gray.700' }}
+            >
+              {currency && (
+                <>
+                  <Image boxSize="2rem" borderRadius="full" src={currency.icon} />
+                  <Text fontWeight="medium">{currency.symbol}</Text>
+                  <Text fontSize="sm" color="gray.500" ml="auto">Fixed</Text>
+                </>
+              )}
+            </HStack>
+          </Box>
+        ) : (
+          <Menu>
+            <MenuButton minH="48px" as={Button} rightIcon={<ChevronDownIcon />}>
+              {currency ? (
+                <Flex direction="row">
+                  <Image boxSize="2rem" borderRadius="full" src={currency.icon} mr="12px" />
+                  <Text my="auto">{currency.symbol}</Text>
+                </Flex>
+              ) : (
+                'Select currency'
+              )}
+            </MenuButton>
+            <MenuList>
+              {options.map((token) => (
+                <MenuItem
+                  minH="48px"
+                  key={token.tokenAddress}
+                  onClick={() => setCurrency(token)}
+                  display={'flex'}
+                  flexDir={'row'}
+                >
+                  <Image boxSize="2rem" borderRadius="full" src={token.icon} ml="2px" mr="14px" />
+                  <Text my="auto">{token.symbol}</Text>
+                  {token.tokenAddress.toLowerCase() === currency?.tokenAddress.toLowerCase() && (
+                    <CheckIcon ml="auto" />
+                  )}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+        )}
         <Button
           isDisabled={!currency}
           onClick={async () => {
