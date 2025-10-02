@@ -91,11 +91,13 @@ export function useCollectionCardStats(item: NftContract): CollectionCardStats {
       return curr.pricePerToken < acc.pricePerToken ? curr : acc;
     }, pool[0]);
 
-    const chainDecimals = item.chain.nativeCurrency?.decimals ?? 18;
+    // Get correct decimals for the token (USDT0 uses 6 decimals, native uses chain decimals)
+    const isPreferredToken = preferredListings.length > 0;
+    const tokenDecimals = isPreferredToken ? 6 : (item.chain.nativeCurrency?.decimals ?? 18); // USDT0 typically uses 6 decimals
     const nativeSymbol = item.chain.nativeCurrency?.symbol ?? 'ETH';
-    const symbol = preferredListings.length ? PREFERRED_CURRENCY_SYMBOL : nativeSymbol;
+    const symbol = isPreferredToken ? PREFERRED_CURRENCY_SYMBOL : nativeSymbol;
 
-    return `${toTokens(min.pricePerToken, chainDecimals)} ${symbol}`;
+    return `${toTokens(min.pricePerToken, tokenDecimals)} ${symbol}`;
   }, [allListings, item.address, item.chain, preferredTokenAddresses]);
 
   // Get volume from sale events
@@ -118,14 +120,14 @@ export function useCollectionCardStats(item: NftContract): CollectionCardStats {
 
     if (preferredListing) {
       return {
-        preferredDecimals: chainDecimals, // USDT0 typically uses 6 decimals, but we'll use chain decimals for consistency
+        preferredDecimals: 6, // USDT0 uses 6 decimals
         preferredSymbol: PREFERRED_CURRENCY_SYMBOL,
       };
     }
 
     if (preferredTokenAddresses.length) {
       return {
-        preferredDecimals: chainDecimals,
+        preferredDecimals: 6, // USDT0 uses 6 decimals
         preferredSymbol: PREFERRED_CURRENCY_SYMBOL,
       };
     }
