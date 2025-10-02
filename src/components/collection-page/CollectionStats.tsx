@@ -1,6 +1,7 @@
 'use client';
 
-import { Divider, Flex, HStack, Image, Skeleton, Text } from '@chakra-ui/react';
+import { Divider, Flex, HStack, Skeleton, Text, Box } from '@chakra-ui/react';
+import Image from 'next/image';
 import { useCollectionStats } from '@/hooks/useCollectionStats';
 
 function InlineStat({ label, value, showIcon }: { label: string; value: string; showIcon?: boolean }) {
@@ -11,7 +12,15 @@ function InlineStat({ label, value, showIcon }: { label: string; value: string; 
       </Text>
       <HStack spacing={1} align="center">
         {showIcon && value !== '-' && value !== 'N/A' && (
-          <Image src="/erc20-icons/usdt0_logo.png" alt="USDT0" boxSize="18px" />
+          <Box position="relative" width="18px" height="18px" flexShrink={0}>
+            <Image 
+              src="/erc20-icons/usdt0_logo.png" 
+              alt="USDT0" 
+              fill
+              sizes="18px"
+              style={{ objectFit: 'contain' }}
+            />
+          </Box>
         )}
         <Text fontSize={{ base: 'lg', md: '2xl' }} fontWeight={800} lineHeight={1.1}>
           {value}
