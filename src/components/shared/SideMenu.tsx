@@ -18,10 +18,9 @@ import {
   DrawerOverlay,
   useColorMode,
   useDisclosure,
+  Text,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { FaRegMoon } from 'react-icons/fa';
-import { IoSunny } from 'react-icons/io5';
 import { ConnectButton, useActiveAccount, useActiveWallet, useDisconnect } from 'thirdweb/react';
 
 export function SideMenu() {
@@ -43,11 +42,7 @@ export function SideMenu() {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>
-            <Button height="56px" w="56px" onClick={toggleColorMode} mr="10px">
-              {colorMode === 'light' ? <FaRegMoon /> : <IoSunny />}
-            </Button>
-          </DrawerHeader>
+          <DrawerHeader>Menu</DrawerHeader>
           <DrawerBody>
             <Box mb="6" display="flex" flexDirection="column" gap="4">
               <Link href="/" onClick={onClose}>
@@ -56,9 +51,16 @@ export function SideMenu() {
               <Link href="/drop" onClick={onClose}>
                 Drops
               </Link>
-              <Link href="/#faqs" onClick={onClose}>
-                FAQs
+              <Link href="/swap" onClick={onClose}>
+                Swap
               </Link>
+              <Link href="/faq" onClick={onClose}>
+                FAQ
+              </Link>
+              <Box opacity={0.5} cursor="not-allowed">
+                <Text>Leaderboard</Text>
+                <Text fontSize="xs" color="gray.500">Coming Soon</Text>
+              </Box>
               {account && (
                 <Link href="/profile" onClick={onClose}>
                   Profile {ensName ? `(${ensName})` : ''}

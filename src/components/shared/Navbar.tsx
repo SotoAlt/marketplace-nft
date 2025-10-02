@@ -17,11 +17,10 @@ import {
   MenuList,
   Image,
   useColorMode,
+  Tooltip,
 } from '@chakra-ui/react';
 import { blo } from 'blo';
-import { FaRegMoon } from 'react-icons/fa';
 import { FiUser } from 'react-icons/fi';
-import { IoSunny } from 'react-icons/io5';
 import { ConnectButton, useActiveAccount, useActiveWallet, useDisconnect } from 'thirdweb/react';
 import type { Wallet } from 'thirdweb/wallets';
 import { SideMenu } from './SideMenu';
@@ -46,10 +45,17 @@ export function Navbar() {
           </Heading>
         </Flex>
         <Box display={{ lg: 'block', base: 'none' }}>
-          <Button as={Link} href="/#faqs" variant="ghost" mr="10px">
-            FAQs
+          <Button as={Link} href="/swap" variant="ghost" mr="10px">
+            Swap
           </Button>
-          <ToggleThemeButton />
+          <Button as={Link} href="/faq" variant="ghost" mr="10px">
+            FAQ
+          </Button>
+          <Tooltip label="Coming Soon" placement="bottom">
+            <Button variant="ghost" mr="10px" isDisabled cursor="not-allowed">
+              Leaderboard
+            </Button>
+          </Tooltip>
           {account && wallet ? (
             <ProfileButton address={account.address} wallet={wallet} />
           ) : (
@@ -109,14 +115,5 @@ function ProfileButton({ address, wallet }: { address: string; wallet: Wallet })
         </MenuItem>
       </MenuList>
     </Menu>
-  );
-}
-
-function ToggleThemeButton() {
-  const { colorMode, toggleColorMode } = useColorMode();
-  return (
-    <Button height="56px" w="56px" onClick={toggleColorMode} mr="10px">
-      {colorMode === 'light' ? <FaRegMoon /> : <IoSunny />}
-    </Button>
   );
 }
