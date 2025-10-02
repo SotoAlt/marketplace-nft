@@ -17,23 +17,52 @@ export type CollectionStats = {
   isLoading: boolean;
 };
 
+const PREFERRED_CURRENCY_SYMBOL = 'USDT0';
+
 export function useCollectionStats(): CollectionStats {
-  const { nftContract, marketplaceContract, listingsInSelectedCollection, supplyInfo, type } =
-    useMarketplaceContext();
+  const {
+    nftContract,
+    marketplaceContract,
+    listingsInSelectedCollection,
+    supplyInfo,
+    type,
+    supportedTokens,
+  } = useMarketplaceContext();
+
+  const preferredTokenAddresses = useMemo(
+    () =>
+      supportedTokens
+        .filter((token) => token.symbol?.toUpperCase() === PREFERRED_CURRENCY_SYMBOL)
+        .map((token) => token.tokenAddress.toLowerCase()),
+    [supportedTokens]
+  );
 
   // Floor price from active listings, prioritizing native currency listings
   const floorDisplay = useMemo(() => {
     if (!listingsInSelectedCollection?.length) return undefined;
+    const preferredListings = listingsInSelectedCollection.filter((listing) => {
+      const tokenAddress = listing.currencyValuePerToken.tokenAddress.toLowerCase();
+      const symbol = listing.currencyValuePerToken.symbol?.toUpperCase();
+      if (symbol === PREFERRED_CURRENCY_SYMBOL) return true;
+      return preferredTokenAddresses.includes(tokenAddress);
+    });
     const nativeListings = listingsInSelectedCollection.filter(
       (l) => l.currencyValuePerToken.tokenAddress.toLowerCase() === NATIVE_TOKEN_ADDRESS
     );
-    const pool = nativeListings.length ? nativeListings : listingsInSelectedCollection;
+    const pool = preferredListings.length
+      ? preferredListings
+      : nativeListings.length
+        ? nativeListings
+        : listingsInSelectedCollection;
     const min = pool.reduce((acc, curr) => {
       if (!acc) return curr;
       return curr.currencyValuePerToken.value < acc.currencyValuePerToken.value ? curr : acc;
     }, pool[0]);
-    return `${min.currencyValuePerToken.displayValue} ${min.currencyValuePerToken.symbol}`;
-  }, [listingsInSelectedCollection]);
+    const symbol =
+      min.currencyValuePerToken.symbol ||
+      (preferredListings.length ? PREFERRED_CURRENCY_SYMBOL : '');
+    return `${min.currencyValuePerToken.displayValue} ${symbol}`.trim();
+  }, [listingsInSelectedCollection, preferredTokenAddresses]);
 
   // Listed vs Supply
   const { listed, supplyBn } = useMemo(() => {
@@ -69,9 +98,36 @@ export function useCollectionStats(): CollectionStats {
     return `${owners.size}`;
   }, [ownersChunk, supplyInfo, totalItems, type]);
 
-  // Volume = sum of NewSale events amounts (native token assumed)
+  // Volume = sum of NewSale events amounts (prefer USDT0 stable pricing)
   const chainDecimals = nftContract.chain.nativeCurrency?.decimals ?? 18;
   const nativeSymbol = nftContract.chain.nativeCurrency?.symbol ?? '';
+  const { preferredDecimals, preferredSymbol } = useMemo(() => {
+    const preferredListing = listingsInSelectedCollection?.find((listing) => {
+      const tokenAddress = listing.currencyValuePerToken.tokenAddress.toLowerCase();
+      const symbol = listing.currencyValuePerToken.symbol?.toUpperCase();
+      if (symbol === PREFERRED_CURRENCY_SYMBOL) return true;
+      return preferredTokenAddresses.includes(tokenAddress);
+    });
+
+    if (preferredListing) {
+      return {
+        preferredDecimals: preferredListing.currencyValuePerToken.decimals ?? chainDecimals,
+        preferredSymbol: preferredListing.currencyValuePerToken.symbol || PREFERRED_CURRENCY_SYMBOL,
+      };
+    }
+
+    if (preferredTokenAddresses.length) {
+      return {
+        preferredDecimals: chainDecimals,
+        preferredSymbol: PREFERRED_CURRENCY_SYMBOL,
+      };
+    }
+
+    return {
+      preferredDecimals: chainDecimals,
+      preferredSymbol: nativeSymbol,
+    };
+  }, [chainDecimals, listingsInSelectedCollection, nativeSymbol, preferredTokenAddresses]);
   const { data: saleEvents, isLoading: loadingSales } = useContractEvents({
     contract: marketplaceContract!,
     blockRange: 200000,
@@ -86,8 +142,8 @@ export function useCollectionStats(): CollectionStats {
       const amt = (ev.args?.totalPricePaid as bigint) ?? 0n;
       return acc + amt;
     }, 0n);
-    return `${toTokens(sum, chainDecimals)} ${nativeSymbol}`.trim();
-  }, [saleEvents, chainDecimals, nativeSymbol]);
+    return `${toTokens(sum, preferredDecimals)} ${preferredSymbol}`.trim();
+  }, [saleEvents, preferredDecimals, preferredSymbol]);
 
   return {
     floorDisplay,

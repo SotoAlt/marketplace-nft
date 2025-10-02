@@ -459,7 +459,10 @@ function decodeEligibilityReason(reason: string) {
   if (lower.includes('wallet not connected')) {
     return 'Connect your wallet to continue.';
   }
-  if (lower.includes('dropclaimexceedlimit') || (lower.includes('exceed') && lower.includes('limit'))) {
+  if (
+    lower.includes('dropclaimexceedlimit') ||
+    (lower.includes('exceed') && lower.includes('limit'))
+  ) {
     // Try to extract numbers from the error message (e.g., "2,3" means minted 2, trying for 3rd)
     const numbers = reason.match(/\d+/g);
     if (numbers && numbers.length >= 1) {

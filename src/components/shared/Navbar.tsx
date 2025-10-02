@@ -87,9 +87,9 @@ function ProfileButton({ address, wallet }: { address: string; wallet: Wallet })
       </MenuButton>
       <MenuList>
         <Box px="3" py="2">
-          <ConnectButton 
-            client={client} 
-            wallets={supportedWallets} 
+          <ConnectButton
+            client={client}
+            wallets={supportedWallets}
             theme={colorMode}
             connectModal={{
               size: 'compact',

@@ -33,6 +33,11 @@ import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import dynamic from 'next/dynamic';
 import { NftDetails } from './NftDetails';
 import RelatedListings from './RelatedListings';
+import {
+  CardBody as TiltBody,
+  CardContainer as TiltContainer,
+  CardItem as TiltItem,
+} from '@/components/ui/3d-card';
 
 const CancelListingButton = dynamic(() => import('./CancelListingButton'), {
   ssr: false,
@@ -72,7 +77,11 @@ export function Token(props: Props) {
       item.asset.id === BigInt(tokenId)
   );
 
-  const ownedByYou = nft?.owner?.toLowerCase() === account?.address.toLowerCase();
+  const accountAddress = account?.address?.toLowerCase();
+  const ownedByYou = nft?.owner?.toLowerCase() === accountAddress;
+  const hasListingByYou =
+    !!accountAddress &&
+    listings.some((item) => item.creatorAddress.toLowerCase() === accountAddress);
 
   const lowestPriceListing =
     listings.length > 0
@@ -90,19 +99,24 @@ export function Token(props: Props) {
         <GridItem>
           <VStack spacing={6} align="stretch">
             {/* NFT Image */}
-            <Box bg="gray.900" p={0} overflow="hidden">
-              <Box position="relative">
-                <MediaRenderer
-                  client={client}
-                  src={nft?.metadata.image || NFT_PLACEHOLDER_IMAGE}
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    aspectRatio: '1',
-                  }}
-                />
-              </Box>
-            </Box>
+            <TiltContainer containerStyle={{ padding: 0 }} style={{ width: '100%' }}>
+              <TiltBody style={{ width: '100%', height: 'auto' }}>
+                <TiltItem translateZ={60} style={{ width: '100%' }}>
+                  <Box w="100%" borderWidth="1px" borderRadius="0" overflow="hidden" bg="gray.900">
+                    <MediaRenderer
+                      client={client}
+                      src={nft?.metadata.image || NFT_PLACEHOLDER_IMAGE}
+                      style={{
+                        height: '100%',
+                        width: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
+                  </Box>
+                </TiltItem>
+              </TiltBody>
+            </TiltContainer>
 
             {/* Accordion Sections */}
             <Accordion allowMultiple defaultIndex={[0, 1, 2]} allowToggle>
@@ -249,9 +263,10 @@ export function Token(props: Props) {
             </Box>
 
             {/* Create Listing */}
-            {account && nft && (ownedByYou || (ownedQuantity1155 && ownedQuantity1155 > 0n)) && (
-              <CreateListing tokenId={nft?.id} account={account} />
-            )}
+            {account &&
+              nft &&
+              (ownedByYou || (ownedQuantity1155 && ownedQuantity1155 > 0n)) &&
+              !hasListingByYou && <CreateListing tokenId={nft?.id} account={account} />}
 
             {/* Listings & Offers */}
             <Accordion allowMultiple defaultIndex={[0]} allowToggle>
@@ -288,7 +303,7 @@ export function Token(props: Props) {
                         <Tbody>
                           {listings.map((item) => {
                             const listedByYou =
-                              item.creatorAddress.toLowerCase() === account?.address.toLowerCase();
+                              item.creatorAddress.toLowerCase() === accountAddress;
                             return (
                               <Tr key={item.id.toString()}>
                                 <Td borderColor="gray.700">

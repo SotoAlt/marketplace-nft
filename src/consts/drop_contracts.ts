@@ -1,6 +1,7 @@
 import type { Chain } from 'thirdweb';
-import { base, plasma, plasmaTestnet, sepolia } from './chains';
+import { plasma, plasmaTestnet } from './chains';
 import { NFT_PLACEHOLDER_IMAGE } from './client';
+import { SHOULD_INCLUDE_TESTNET_RESOURCES } from './environment';
 
 export type DropContract = {
   address: string;
@@ -14,7 +15,7 @@ export type DropContract = {
   phaseDeadlines?: number[];
 };
 
-export const DROP_CONTRACTS: DropContract[] = [
+const baseDropContracts: DropContract[] = [
   {
     address: '0xB4ab5b0A52432eA35030459958059a7B31E191C4',
     chain: plasma,
@@ -27,6 +28,9 @@ export const DROP_CONTRACTS: DropContract[] = [
       1760121600, // 2025-10-10T00:00:00Z
     ],
   },
+];
+
+const testnetDropContracts: DropContract[] = [
   {
     address: '0x3d5c08df863085a516de9820C836E7c0d632A831',
     chain: plasmaTestnet,
@@ -44,16 +48,8 @@ export const DROP_CONTRACTS: DropContract[] = [
       1761331200, // 2025-10-24T00:00:00Z
     ],
   },
-  // {
-  //   address: '0x6d3EBD12eb82653f872344EC4d0e15B8C0C32c83',
-  //   chain: sepolia,
-  //   type: 'DropERC721',
-  //   title: 'Sepolia Test',
-  //   thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
-  //   description: 'Claim experimental Base drop tokens while supplies last.',
-  //   slug: 'sepolia-test-nft-drop',
-  //   phaseDeadlines: [
-  //     1760121600, // 2025-10-10T00:00:00Z
-  //   ],
-  // },
 ];
+
+export const DROP_CONTRACTS: DropContract[] = SHOULD_INCLUDE_TESTNET_RESOURCES
+  ? [...baseDropContracts, ...testnetDropContracts]
+  : baseDropContracts;

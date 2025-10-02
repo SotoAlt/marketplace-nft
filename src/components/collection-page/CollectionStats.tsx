@@ -31,7 +31,7 @@ export function CollectionStats() {
       >
         <InlineStat label="Floor Price" value={floorDisplay ?? '-'} />
         <Divider display={{ base: 'none', md: 'block' }} orientation="vertical" h="8" />
-        <InlineStat label="Vol. (24h)" value={volumeDisplay ?? '-'} />
+        <InlineStat label="Recent Volume" value={volumeDisplay ?? '-'} />
         <Divider display={{ base: 'none', md: 'block' }} orientation="vertical" h="8" />
         <InlineStat label="Listed / Supply" value={`${listed} / ${supplyDisplay}`} />
         <Divider display={{ base: 'none', md: 'block' }} orientation="vertical" h="8" />

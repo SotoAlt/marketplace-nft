@@ -17,6 +17,7 @@ import {
   HStack,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { NATIVE_TOKEN_ADDRESS, sendAndConfirmTransaction } from 'thirdweb';
 import {
   isApprovedForAll as isApprovedForAll1155,
@@ -42,21 +43,21 @@ export function CreateListing(props: Props) {
   const switchChain = useSwitchActiveWalletChain();
   const activeChain = useActiveWalletChain();
   const [currency, setCurrency] = useState<Token>();
+  const [isListing, setIsListing] = useState(false);
   const toast = useToast();
+  const router = useRouter();
 
   const { nftContract, marketplaceContract, refetchAllListings, type, supportedTokens } =
     useMarketplaceContext();
   const chain = marketplaceContract.chain;
 
   const isPlasmaMainnet = chain.id === plasma.id;
-  
+
   // Auto-select USDT0 for Plasma mainnet
   useEffect(() => {
     if (isPlasmaMainnet && supportedTokens.length > 0) {
       // Find USDT0 token in supported tokens
-      const usdt0Token = supportedTokens.find(token => 
-        token.symbol.toUpperCase() === 'USDT0'
-      );
+      const usdt0Token = supportedTokens.find((token) => token.symbol.toUpperCase() === 'USDT0');
       if (usdt0Token) {
         setCurrency(usdt0Token);
       }
@@ -94,15 +95,15 @@ export function CreateListing(props: Props) {
             <Input type="number" ref={priceRef} placeholder="Enter a price for your listing" />
           </>
         )}
-        
+
         {/* Show fixed USDT0 for Plasma mainnet, dropdown for other chains */}
         {isPlasmaMainnet ? (
           <Box>
             <Text mb={2}>Currency</Text>
-            <HStack 
-              p={3} 
-              borderWidth="1px" 
-              borderRadius="md" 
+            <HStack
+              p={3}
+              borderWidth="1px"
+              borderRadius="md"
               bg="gray.50"
               _dark={{ bg: 'gray.700' }}
             >
@@ -147,6 +148,7 @@ export function CreateListing(props: Props) {
         )}
         <Button
           isDisabled={!currency}
+          isLoading={isListing}
           onClick={async () => {
             const value = priceRef.current?.value;
             if (!value) {
@@ -181,44 +183,76 @@ export function CreateListing(props: Props) {
               }
             }
 
-            // Check for approval
-            const checkApprove = type === 'ERC1155' ? isApprovedForAll1155 : isApprovedForAll721;
+            setIsListing(true);
+            try {
+              // Check for approval
+              const checkApprove = type === 'ERC1155' ? isApprovedForAll1155 : isApprovedForAll721;
 
-            const isApproved = await checkApprove({
-              contract: nftContract,
-              owner: account.address,
-              operator: marketplaceContract.address,
-            });
-
-            if (!isApproved) {
-              const setApproval = type === 'ERC1155' ? setApprovalForAll1155 : setApprovalForAll721;
-
-              const approveTx = setApproval({
+              const isApproved = await checkApprove({
                 contract: nftContract,
+                owner: account.address,
                 operator: marketplaceContract.address,
-                approved: true,
+              });
+
+              if (!isApproved) {
+                const setApproval =
+                  type === 'ERC1155' ? setApprovalForAll1155 : setApprovalForAll721;
+
+                const approveTx = setApproval({
+                  contract: nftContract,
+                  operator: marketplaceContract.address,
+                  approved: true,
+                });
+
+                await sendAndConfirmTransaction({
+                  transaction: approveTx,
+                  account,
+                });
+              }
+
+              const transaction = createListing({
+                contract: marketplaceContract,
+                assetContractAddress: nftContract.address,
+                tokenId,
+                quantity: type === 'ERC721' ? 1n : _qty,
+                currencyContractAddress: currency?.tokenAddress,
+                pricePerToken: value,
+              });
+
+              toast({
+                title: 'Listing transaction submitted',
+                description: 'Confirm the listing in your wallet',
+                status: 'info',
+                duration: 5000,
+                isClosable: true,
               });
 
               await sendAndConfirmTransaction({
-                transaction: approveTx,
+                transaction,
                 account,
               });
+
+              toast({
+                title: 'Listing created successfully',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+              });
+              refetchAllListings();
+              router.refresh();
+            } catch (err) {
+              console.error(err);
+              toast({
+                title: 'Failed to create listing',
+                description:
+                  err instanceof Error ? err.message : 'Check your wallet and try again.',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+              });
+            } finally {
+              setIsListing(false);
             }
-
-            const transaction = createListing({
-              contract: marketplaceContract,
-              assetContractAddress: nftContract.address,
-              tokenId,
-              quantity: type === 'ERC721' ? 1n : _qty,
-              currencyContractAddress: currency?.tokenAddress,
-              pricePerToken: value,
-            });
-
-            await sendAndConfirmTransaction({
-              transaction,
-              account,
-            });
-            refetchAllListings();
           }}
         >
           List

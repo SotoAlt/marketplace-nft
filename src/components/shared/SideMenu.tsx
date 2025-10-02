@@ -66,9 +66,9 @@ export function SideMenu() {
               )}
             </Box>
             <Box>
-              <ConnectButton 
-                theme={colorMode} 
-                client={client} 
+              <ConnectButton
+                theme={colorMode}
+                client={client}
                 wallets={supportedWallets}
                 connectModal={{
                   size: 'compact',
