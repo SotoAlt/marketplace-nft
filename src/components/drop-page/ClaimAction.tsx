@@ -45,14 +45,8 @@ export function ClaimAction({
   chainName: string;
 }) {
   const toast = useToast();
-  const { 
-    contract, 
-    refetch, 
-    isERC20Currency, 
-    currencyAddress, 
-    activeClaimCondition,
-    drop 
-  } = useNftDropContext();
+  const { contract, refetch, isERC20Currency, currencyAddress, activeClaimCondition, drop } =
+    useNftDropContext();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
 
@@ -137,7 +131,7 @@ export function ClaimAction({
               amount: totalPrice.toString(),
             });
             await sendAndConfirmTransaction({ transaction: approveTransaction, account });
-            
+
             toast({
               title: 'Approval successful',
               description: 'Now proceeding with minting...',

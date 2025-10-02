@@ -9,7 +9,7 @@ const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ChakraProvider theme={chakraTheme}>
+    <ChakraProvider toastOptions={{ defaultOptions: { position: 'top' } }} theme={chakraTheme}>
       <ColorModeScript initialColorMode={chakraThemeConfig.initialColorMode} />
       <QueryClientProvider client={queryClient}>
         <ThirdwebProvider>{children}</ThirdwebProvider>
