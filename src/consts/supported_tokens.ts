@@ -76,7 +76,7 @@ export const SUPPORTED_TOKENS: SupportedTokens[] = [
       {
         tokenAddress: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb',
         symbol: 'USDT0',
-        icon: '/erc20-icons/usdt0_logo.png',
+        icon: '/erc20-icons/usdt.png',
       },
     ],
   },
