@@ -21,6 +21,7 @@ import {
   Stack,
   Button,
   Badge,
+  Image,
 } from '@chakra-ui/react';
 import { getContract } from 'thirdweb';
 import { getContractMetadata } from 'thirdweb/extensions/common';
@@ -194,9 +195,14 @@ function CollectionCard({ item }: { item: NftContract }) {
               {isLoading ? (
                 <Skeleton height="16px" width="60px" />
               ) : (
-                <Text fontWeight="bold" fontSize="sm" color="white">
-                  {floorDisplay ?? 'N/A'}
-                </Text>
+                <HStack spacing={1}>
+                  {floorDisplay && floorDisplay !== 'N/A' && (
+                    <Image src="/erc20-icons/usdt0_logo.png" alt="USDT0" boxSize="14px" />
+                  )}
+                  <Text fontWeight="bold" fontSize="sm" color="white">
+                    {floorDisplay ?? 'N/A'}
+                  </Text>
+                </HStack>
               )}
             </HStack>
             <HStack justify="space-between" align="center">
@@ -206,9 +212,14 @@ function CollectionCard({ item }: { item: NftContract }) {
               {isLoading ? (
                 <Skeleton height="16px" width="60px" />
               ) : (
-                <Text fontWeight="bold" fontSize="sm" color="white">
-                  {volumeDisplay ?? 'N/A'}
-                </Text>
+                <HStack spacing={1}>
+                  {volumeDisplay && volumeDisplay !== 'N/A' && (
+                    <Image src="/erc20-icons/usdt0_logo.png" alt="USDT0" boxSize="14px" />
+                  )}
+                  <Text fontWeight="bold" fontSize="sm" color="white">
+                    {volumeDisplay ?? 'N/A'}
+                  </Text>
+                </HStack>
               )}
             </HStack>
           </VStack>

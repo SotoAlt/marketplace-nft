@@ -1,17 +1,22 @@
 'use client';
 
-import { Divider, Flex, Skeleton, Text } from '@chakra-ui/react';
+import { Divider, Flex, HStack, Image, Skeleton, Text } from '@chakra-ui/react';
 import { useCollectionStats } from '@/hooks/useCollectionStats';
 
-function InlineStat({ label, value }: { label: string; value: string }) {
+function InlineStat({ label, value, showIcon }: { label: string; value: string; showIcon?: boolean }) {
   return (
     <Flex direction="column" minW="max-content">
       <Text fontSize="xs" color="gray.400">
         {label}
       </Text>
-      <Text fontSize={{ base: 'lg', md: '2xl' }} fontWeight={800} lineHeight={1.1}>
-        {value}
-      </Text>
+      <HStack spacing={1} align="center">
+        {showIcon && value !== '-' && value !== 'N/A' && (
+          <Image src="/erc20-icons/usdt0_logo.png" alt="USDT0" boxSize="18px" />
+        )}
+        <Text fontSize={{ base: 'lg', md: '2xl' }} fontWeight={800} lineHeight={1.1}>
+          {value}
+        </Text>
+      </HStack>
     </Flex>
   );
 }
@@ -29,9 +34,9 @@ export function CollectionStats() {
         justify={{ base: 'flex-start', md: 'flex-end' }}
         w="full"
       >
-        <InlineStat label="Floor Price" value={floorDisplay ?? '-'} />
+        <InlineStat label="Floor Price" value={floorDisplay ?? '-'} showIcon />
         <Divider display={{ base: 'none', md: 'block' }} orientation="vertical" h="8" />
-        <InlineStat label="Recent Volume" value={volumeDisplay ?? '-'} />
+        <InlineStat label="Recent Volume" value={volumeDisplay ?? '-'} showIcon />
         <Divider display={{ base: 'none', md: 'block' }} orientation="vertical" h="8" />
         <InlineStat label="Listed / Supply" value={`${listed} / ${supplyDisplay}`} />
         <Divider display={{ base: 'none', md: 'block' }} orientation="vertical" h="8" />

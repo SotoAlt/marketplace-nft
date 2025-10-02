@@ -21,8 +21,6 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { FaRegMoon } from 'react-icons/fa';
-import { IoSunny } from 'react-icons/io5';
 import { ConnectButton, useActiveAccount, useActiveWallet, useDisconnect } from 'thirdweb/react';
 
 export function SideMenu() {
@@ -44,11 +42,7 @@ export function SideMenu() {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>
-            <Button height="56px" w="56px" onClick={toggleColorMode} mr="10px">
-              {colorMode === 'light' ? <FaRegMoon /> : <IoSunny />}
-            </Button>
-          </DrawerHeader>
+          <DrawerHeader>Menu</DrawerHeader>
           <DrawerBody>
             <Box mb="6" display="flex" flexDirection="column" gap="4">
               <Link href="/" onClick={onClose}>
