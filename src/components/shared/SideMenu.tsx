@@ -18,6 +18,7 @@ import {
   DrawerOverlay,
   useColorMode,
   useDisclosure,
+  Text,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { FaRegMoon } from 'react-icons/fa';
@@ -56,9 +57,16 @@ export function SideMenu() {
               <Link href="/drop" onClick={onClose}>
                 Drops
               </Link>
-              <Link href="/#faqs" onClick={onClose}>
-                FAQs
+              <Link href="/swap" onClick={onClose}>
+                Swap
               </Link>
+              <Link href="/faq" onClick={onClose}>
+                FAQ
+              </Link>
+              <Box opacity={0.5} cursor="not-allowed">
+                <Text>Leaderboard</Text>
+                <Text fontSize="xs" color="gray.500">Coming Soon</Text>
+              </Box>
               {account && (
                 <Link href="/profile" onClick={onClose}>
                   Profile {ensName ? `(${ensName})` : ''}

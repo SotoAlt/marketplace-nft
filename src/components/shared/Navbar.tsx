@@ -17,6 +17,7 @@ import {
   MenuList,
   Image,
   useColorMode,
+  Tooltip,
 } from '@chakra-ui/react';
 import { blo } from 'blo';
 import { FaRegMoon } from 'react-icons/fa';
@@ -46,9 +47,17 @@ export function Navbar() {
           </Heading>
         </Flex>
         <Box display={{ lg: 'block', base: 'none' }}>
-          <Button as={Link} href="/#faqs" variant="ghost" mr="10px">
-            FAQs
+          <Button as={Link} href="/swap" variant="ghost" mr="10px">
+            Swap
           </Button>
+          <Button as={Link} href="/faq" variant="ghost" mr="10px">
+            FAQ
+          </Button>
+          <Tooltip label="Coming Soon" placement="bottom">
+            <Button variant="ghost" mr="10px" isDisabled cursor="not-allowed">
+              Leaderboard
+            </Button>
+          </Tooltip>
           <ToggleThemeButton />
           {account && wallet ? (
             <ProfileButton address={account.address} wallet={wallet} />
