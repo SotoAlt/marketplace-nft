@@ -19,6 +19,8 @@ import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import { ListingsTabContent } from './ListingsTabContent';
 import { AllNftsGrid } from './AllNftsGrid';
 import { CollectionStats } from './CollectionStats';
+import { CollectionBanner } from './CollectionBanner';
+import { CollectionSocials } from './CollectionSocials';
 import { shortenAddress } from 'thirdweb/utils';
 import { useOwnedNfts } from '@/hooks/useOwnedNfts';
 import { OwnedNftsPanel } from './OwnedNftsPanel';
@@ -56,8 +58,20 @@ export function Collection() {
 
   const thumbnailImage =
     contractMetadata?.image || firstNFT?.metadata.image || NFT_PLACEHOLDER_IMAGE;
+  
+  // Extract social links from contract metadata
+  const socialLinks = {
+    twitter: (contractMetadata as any)?.external_link?.includes('twitter.com') 
+      ? (contractMetadata as any)?.external_link 
+      : (contractMetadata as any)?.twitter,
+    discord: (contractMetadata as any)?.discord,
+    website: (contractMetadata as any)?.external_link || (contractMetadata as any)?.website,
+  };
+
   return (
-    <Box mt="24px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
+    <>
+      <CollectionBanner />
+      <Box mt="24px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
       <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 10 }} align="stretch">
         {/* Left: Image + Title + Description */}
         <Flex w={{ base: 'full', md: 'fit-content' }} flexShrink={0} align="flex-start">
@@ -77,14 +91,21 @@ export function Collection() {
               />
             </Box>
             <Flex direction="column" gap={1} minW={0}>
-              <Heading
-                size="lg"
-                lineHeight={1.1}
-                noOfLines={1}
-                textAlign={{ base: 'left', md: 'left' }}
-              >
-                {contractMetadata?.name || 'Unknown collection'}
-              </Heading>
+              <HStack spacing={3} align="center">
+                <Heading
+                  size="lg"
+                  lineHeight={1.1}
+                  noOfLines={1}
+                  textAlign={{ base: 'left', md: 'left' }}
+                >
+                  {contractMetadata?.name || 'Unknown collection'}
+                </Heading>
+                <CollectionSocials 
+                  twitter={socialLinks.twitter}
+                  discord={socialLinks.discord}
+                  website={socialLinks.website}
+                />
+              </HStack>
               <Text fontSize="sm" color="gray.400" noOfLines={1}>
                 {shortenAddress(nftContract.address)}
               </Text>
@@ -137,5 +158,6 @@ export function Collection() {
         </TabPanels>
       </Tabs>
     </Box>
+    </>
   );
 }
