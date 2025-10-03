@@ -15,8 +15,8 @@ export const chakraTheme = extendTheme({
   components: {
     Button: {
       baseStyle: {
-        fontFamily: 'var(--font-pixelify), sans-serif',
-        fontWeight: 'normal',
+        fontFamily: 'var(--font-roboto), sans-serif',
+        fontWeight: '500',
         letterSpacing: '0.5px',
       },
     },
@@ -38,12 +38,13 @@ export const chakraTheme = extendTheme({
     },
     Badge: {
       baseStyle: {
-        fontFamily: 'var(--font-pixelify), sans-serif',
+        fontFamily: 'var(--font-roboto), sans-serif',
       },
     },
     Tab: {
       baseStyle: {
-        fontFamily: 'var(--font-pixelify), sans-serif',
+        fontFamily: 'var(--font-roboto), sans-serif',
+        fontWeight: '500',
       },
     },
   },
