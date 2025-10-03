@@ -51,12 +51,9 @@ export default function Home() {
       {/* Featured Collections Section */}
       <VStack spacing={8} align="stretch">
         <Box>
-          <Heading as="h2" size="xl" mb={2} fontFamily="var(--font-roboto)" fontWeight="500">
+          <Heading as="h2" size="xl" mb={2}>
             Featured Collections
           </Heading>
-          <Text color="gray.500" fontSize="lg">
-            Curated selections from top creators and trending projects
-          </Text>
         </Box>
 
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} w="full" justifyItems="center">
@@ -69,12 +66,9 @@ export default function Home() {
       {/* Drops Section */}
       <VStack spacing={8} align="stretch" mt={16}>
         <Box>
-          <Heading as="h2" size="xl" mb={2} fontFamily="var(--font-roboto)" fontWeight="500">
+          <Heading as="h2" size="xl" mb={2}>
             Featured Drops
           </Heading>
-          <Text color="gray.500" fontSize="lg">
-            Claim NFTs from active drops curated for this marketplace
-          </Text>
         </Box>
 
         <VStack spacing={4} align="stretch">
@@ -330,7 +324,7 @@ function DropRow({ drop }: { drop: DropContract }) {
             {isLoading ? (
               <Skeleton height="24px" width="240px" />
             ) : (
-              <Heading size="lg" noOfLines={1}>
+              <Heading size="lg" noOfLines={1} fontFamily="var(--font-roboto)" fontWeight="600">
                 {title ?? 'Drop'}
               </Heading>
             )}
