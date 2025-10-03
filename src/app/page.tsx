@@ -41,12 +41,8 @@ export default function Home() {
       <VStack spacing={8} align="center" textAlign="center" mb={16}>
         <VStack spacing={4}>
           <Heading as="h1" size="2xl">
-            Discover Premium NFT Collections
+            Co-create and trade AI-native IP
           </Heading>
-          <Text fontSize="xl" color="gray.500" maxW="2xl">
-            Explore, trade, and collect unique digital assets from verified creators and established
-            collections.
-          </Text>
         </VStack>
 
         {/* Marketplace Stats */}

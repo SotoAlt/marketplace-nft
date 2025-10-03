@@ -77,8 +77,8 @@ export function Collection() {
         <Flex w={{ base: 'full', md: 'fit-content' }} flexShrink={0} align="flex-start">
           <HStack align="center" spacing={{ base: 4, md: 5 }}>
             <Box
-              w={{ base: '64px', md: '96px' }}
-              h={{ base: '64px', md: '96px' }}
+              w={{ base: '80px', md: '120px' }}
+              h={{ base: '80px', md: '120px' }}
               rounded="16px"
               overflow="hidden"
               bg="gray.700"

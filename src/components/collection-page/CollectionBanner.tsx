@@ -8,7 +8,7 @@ export function CollectionBanner() {
     <Box
       position="relative"
       width="100%"
-      height={{ base: '200px', md: '300px', lg: '400px' }}
+      height={{ base: '200px', md: '250px', lg: '300px' }}
       overflow="hidden"
       mb={6}
     >
