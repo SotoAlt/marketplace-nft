@@ -2,10 +2,8 @@
 
 import { client } from '@/consts/client';
 import { DROP_CONTRACTS, type DropContract } from '@/consts/drop_contracts';
-import { SUPPORTED_TOKENS } from '@/consts/supported_tokens';
 import { Box, Spinner } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import type { Abi, AbiFunction } from 'abitype';
 import { type ReactNode, createContext, useContext, useMemo } from 'react';
 import { getContract, type ThirdwebContract, NATIVE_TOKEN_ADDRESS } from 'thirdweb';
 import { resolveContractAbi } from 'thirdweb/contract';
@@ -111,8 +109,8 @@ export default function NftDropProvider({
     queryKey: ['drop', 'selectors', drop.chain.id, drop.address.toLowerCase()],
     queryFn: async () => {
       // Keeping this resolver ensures we can swap contracts later without changing the UI logic.
-      const abi = (await resolveContractAbi(contract)) as Abi;
-      return (abi.filter((item) => item.type === 'function') as AbiFunction[]).map((fn) =>
+      const abi = (await resolveContractAbi(contract)) as any;
+      return (abi.filter((item:any) => item.type === 'function') as any).map((fn:any) =>
         toFunctionSelector(fn)
       );
     },
@@ -307,11 +305,6 @@ export default function NftDropProvider({
       totalUnclaimed: refetchTotalUnclaimed,
     },
   };
-
-  console.log('DROP CONTRACT METADATA >>>', {
-    claimConditions,
-    activeClaimCondition,
-  });
 
   return (
     <NftDropContext.Provider value={contextValue}>
