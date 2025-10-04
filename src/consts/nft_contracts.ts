@@ -30,6 +30,15 @@ const baseNftContracts: NftContract[] = [
     thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
     slug: 'pretrillions-nft',
   },
+  {
+    address: '0xCDCDf097D989073B4181A764dfa7310898B6Bde4',
+    chain: plasma,
+    type: 'ERC721',
+    title: 'PRE-TEST',
+    description: 'Claim experimental Plasma drop tokens while supplies last.',
+    thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
+    slug: 'pre-test-nft',
+  },
 ];
 
 const testnetNftContracts: NftContract[] = [
