@@ -41,33 +41,9 @@ export default function Home() {
       <VStack spacing={8} align="center" textAlign="center" mb={16}>
         <VStack spacing={4}>
           <Heading as="h1" size="2xl">
-            Discover Premium NFT Collections
+            Co-create and trade AI-native NFTs
           </Heading>
-          <Text fontSize="xl" color="gray.500" maxW="2xl">
-            Explore, trade, and collect unique digital assets from verified creators and established
-            collections.
-          </Text>
         </VStack>
-
-        {/* Marketplace Stats */}
-        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8} w="full" maxW="4xl">
-          <Stat textAlign="center">
-            <StatNumber fontSize="2xl">{NFT_CONTRACTS.length}</StatNumber>
-            <StatLabel color="gray.500">Collections</StatLabel>
-          </Stat>
-          <Stat textAlign="center">
-            <StatNumber fontSize="2xl">12.4K</StatNumber>
-            <StatLabel color="gray.500">Items</StatLabel>
-          </Stat>
-          <Stat textAlign="center">
-            <StatNumber fontSize="2xl">3.2K</StatNumber>
-            <StatLabel color="gray.500">Owners</StatLabel>
-          </Stat>
-          <Stat textAlign="center">
-            <StatNumber fontSize="2xl">247 ETH</StatNumber>
-            <StatLabel color="gray.500">Volume</StatLabel>
-          </Stat>
-        </SimpleGrid>
       </VStack>
 
       <Divider mb={12} />
@@ -78,9 +54,6 @@ export default function Home() {
           <Heading as="h2" size="xl" mb={2}>
             Featured Collections
           </Heading>
-          <Text color="gray.500" fontSize="lg">
-            Curated selections from top creators and trending projects
-          </Text>
         </Box>
 
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} w="full" justifyItems="center">
@@ -96,9 +69,6 @@ export default function Home() {
           <Heading as="h2" size="xl" mb={2}>
             Featured Drops
           </Heading>
-          <Text color="gray.500" fontSize="lg">
-            Claim NFTs from active drops curated for this marketplace
-          </Text>
         </Box>
 
         <VStack spacing={4} align="stretch">
@@ -354,7 +324,7 @@ function DropRow({ drop }: { drop: DropContract }) {
             {isLoading ? (
               <Skeleton height="24px" width="240px" />
             ) : (
-              <Heading size="lg" noOfLines={1}>
+              <Heading size="lg" noOfLines={1} fontFamily="var(--font-roboto)" fontWeight="600">
                 {title ?? 'Drop'}
               </Heading>
             )}

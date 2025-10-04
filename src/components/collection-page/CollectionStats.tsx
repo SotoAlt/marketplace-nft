@@ -46,10 +46,11 @@ export function CollectionStats() {
     <Skeleton isLoaded={!isLoading} rounded="xl" w="full">
       <Flex
         direction={{ base: 'column', md: 'row' }}
-        gap={{ base: 2, md: 8 }}
+        gap={{ base: 3, md: 6, lg: 8 }}
         align={{ base: 'flex-start', md: 'center' }}
         justify={{ base: 'flex-start', md: 'flex-end' }}
         w="full"
+        wrap={{ base: 'wrap', md: 'nowrap' }}
       >
         <InlineStat label="Floor Price" value={floorDisplay ?? '-'} showIcon />
         <Divider display={{ base: 'none', md: 'block' }} orientation="vertical" h="8" />

@@ -19,6 +19,8 @@ import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import { ListingsTabContent } from './ListingsTabContent';
 import { AllNftsGrid } from './AllNftsGrid';
 import { CollectionStats } from './CollectionStats';
+import { CollectionBanner } from './CollectionBanner';
+import { CollectionSocials } from './CollectionSocials';
 import { shortenAddress } from 'thirdweb/utils';
 import { useOwnedNfts } from '@/hooks/useOwnedNfts';
 import { OwnedNftsPanel } from './OwnedNftsPanel';
@@ -56,15 +58,27 @@ export function Collection() {
 
   const thumbnailImage =
     contractMetadata?.image || firstNFT?.metadata.image || NFT_PLACEHOLDER_IMAGE;
+  
+  // Extract social links from contract metadata
+  const socialLinks = {
+    twitter: (contractMetadata as any)?.external_link?.includes('twitter.com') 
+      ? (contractMetadata as any)?.external_link 
+      : (contractMetadata as any)?.twitter,
+    discord: (contractMetadata as any)?.discord,
+    website: (contractMetadata as any)?.external_link || (contractMetadata as any)?.website,
+  };
+
   return (
-    <Box mt="24px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
+    <>
+      <CollectionBanner />
+      <Box mt="24px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
       <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 10 }} align="stretch">
         {/* Left: Image + Title + Description */}
         <Flex w={{ base: 'full', md: 'fit-content' }} flexShrink={0} align="flex-start">
           <HStack align="center" spacing={{ base: 4, md: 5 }}>
             <Box
-              w={{ base: '64px', md: '96px' }}
-              h={{ base: '64px', md: '96px' }}
+              w={{ base: '80px', md: '120px' }}
+              h={{ base: '80px', md: '120px' }}
               rounded="16px"
               overflow="hidden"
               bg="gray.700"
@@ -82,12 +96,21 @@ export function Collection() {
                 lineHeight={1.1}
                 noOfLines={1}
                 textAlign={{ base: 'left', md: 'left' }}
+                fontFamily="var(--font-roboto)"
+                fontWeight="600"
               >
                 {contractMetadata?.name || 'Unknown collection'}
               </Heading>
-              <Text fontSize="sm" color="gray.400" noOfLines={1}>
-                {shortenAddress(nftContract.address)}
-              </Text>
+              <HStack spacing={2} align="center">
+                <Text fontSize="sm" color="gray.400" noOfLines={1}>
+                  {shortenAddress(nftContract.address)}
+                </Text>
+                <CollectionSocials 
+                  twitter={socialLinks.twitter}
+                  discord={socialLinks.discord}
+                  website={socialLinks.website}
+                />
+              </HStack>
               {contractMetadata?.description && (
                 <Text maxW={{ base: '320px', md: '420px' }} color="gray.400" noOfLines={2}>
                   {contractMetadata.description}
@@ -100,13 +123,18 @@ export function Collection() {
         {/* Right: Stats aligned to the right of image */}
         <Flex flex="1" align="flex-end">
           <CollectionStats />
-          <Box ml={{ base: 0, md: 4, lg: 6 }} mr={{ base: 0, md: 4, lg: 6 }}>
-            <ListingHelpDialog />
-          </Box>
         </Flex>
       </Flex>
 
-      <Tabs mt={12} variant={'enclosed-colored'} isFitted isLazy defaultIndex={0}>
+      <Flex justify="space-between" align="center" mt={12} mb={4}>
+        <Box flex="1">
+        </Box>
+        <Box>
+          <ListingHelpDialog />
+        </Box>
+      </Flex>
+      
+      <Tabs variant={'enclosed-colored'} isFitted isLazy defaultIndex={0}>
         <TabList>
           <Tab>Listings ({listingsInSelectedCollection.length || 0})</Tab>
           <Tab>
@@ -137,5 +165,6 @@ export function Collection() {
         </TabPanels>
       </Tabs>
     </Box>
+    </>
   );
 }
