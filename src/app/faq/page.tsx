@@ -26,7 +26,7 @@ export default function FaqPage() {
             Everything you need to know about the marketplace
           </Text>
         </Box>
-        
+
         <Accordion allowMultiple defaultIndex={[0]}>
           {FAQS.map((item) => (
             <AccordionItem key={item.id} bg="gray.900" border="1px" borderColor="gray.700" mb={2}>

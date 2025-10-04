@@ -29,8 +29,14 @@ import {
   useConnectModal,
   useSwitchActiveWalletChain,
 } from 'thirdweb/react';
-import { canClaim } from 'thirdweb/extensions/erc721';
-import { toTokens } from 'thirdweb/utils';
+import {
+  canClaim,
+  tokensClaimedEvent,
+  getActiveClaimConditionId,
+} from 'thirdweb/extensions/erc721';
+import { toTokens, getClaimParams } from 'thirdweb/utils';
+import { getContract, getContractEvents, NATIVE_TOKEN_ADDRESS } from 'thirdweb';
+import { getCurrencyMetadata } from 'thirdweb/extensions/erc20';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { resolveScheme } from 'thirdweb/storage';
 import { format, intlFormatDistance } from 'date-fns';
@@ -44,6 +50,9 @@ import {
 import { Icon } from '@chakra-ui/react';
 import { FaDiscord, FaGlobe, FaInstagram, FaTwitter, FaLink } from 'react-icons/fa6';
 import type { IconType } from 'react-icons';
+
+// Shared constant used across this file
+const MAX_UINT256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935n;
 
 export function DropClaim() {
   const {
@@ -74,6 +83,103 @@ export function DropClaim() {
 
   const [quantity, setQuantity] = useState(1);
 
+  // Wallet-specific overrides & minted count
+  const claimParamsQuery = useQuery({
+    queryKey: ['drop', contract.address, 'claimParams', account?.address ?? 'anon'],
+    queryFn: async () => {
+      if (!account) return null;
+      return getClaimParams({
+        contract,
+        type: 'erc721',
+        quantity: 1n,
+        to: account.address,
+        from: account.address,
+      });
+    },
+    enabled: Boolean(account) && isDropReady,
+    staleTime: 0,
+    retry: 0,
+  });
+
+  const activeConditionIdQuery = useQuery({
+    queryKey: ['drop', contract.address, 'activeConditionId'],
+    queryFn: () => getActiveClaimConditionId({ contract }),
+    enabled: isDropReady,
+    staleTime: 0,
+    retry: 0,
+  });
+
+  const mintedByWalletQuery = useQuery({
+    queryKey: [
+      'drop',
+      contract.address,
+      'mintedByWallet',
+      account?.address ?? 'anon',
+      activeConditionIdQuery.data !== undefined
+        ? (activeConditionIdQuery.data as unknown as bigint).toString()
+        : 'no-active-id',
+    ],
+    queryFn: async () => {
+      if (!account) return 0n;
+      const activeId = activeConditionIdQuery.data;
+      if (activeId === undefined) return 0n;
+      const events = await getContractEvents({
+        contract,
+        // filter by current phase and claimer
+        events: [
+          tokensClaimedEvent({
+            claimer: account.address,
+            claimConditionIndex: activeId,
+          }),
+        ],
+        // let thirdweb pick the best source (indexer/rpc)
+      });
+      let total = 0n;
+      for (const e of events) {
+        const qty = (e.args as any)?.quantityClaimed as bigint | undefined;
+        if (typeof qty === 'bigint') total += qty;
+      }
+      return total;
+    },
+    enabled: Boolean(account) && isDropReady && activeConditionIdQuery.data !== undefined,
+    staleTime: 0,
+    retry: 0,
+  });
+
+  const walletOverrideLimit = claimParamsQuery.data?.allowlistProof?.quantityLimitPerWallet;
+  const walletMintedInPhase = mintedByWalletQuery.data ?? 0n;
+
+  const effectivePerWalletLimit = useMemo(() => {
+    if (!activeClaimCondition) return 0n;
+    const globalLimit = activeClaimCondition.quantityLimitPerWallet;
+    // Detect if the phase is allowlist-gated
+    const merkle = activeClaimCondition?.merkleRoot?.toLowerCase?.() ?? '';
+    const isAllowlistGated = Boolean(merkle && !/^0x0+$/i.test(merkle));
+
+    // Respect snapshot override when provided
+    if (walletOverrideLimit !== undefined) {
+      if (walletOverrideLimit === MAX_UINT256) return MAX_UINT256; // unlimited for this wallet
+      if (walletOverrideLimit > 0n) return walletOverrideLimit; // finite per-wallet override
+      // walletOverrideLimit <= 0n: treat as zero (not allowlisted / no allocation)
+      return 0n;
+    }
+
+    // No snapshot override
+    // Treat global 0 as unlimited only for public drops; for allowlist-gated drops,
+    // zero remains a sentinel for "not allowlisted" wallets.
+    if (globalLimit === 0n) {
+      return isAllowlistGated ? 0n : MAX_UINT256;
+    }
+    return globalLimit;
+  }, [activeClaimCondition, walletOverrideLimit]);
+
+  const remainingForWallet = useMemo(() => {
+    if (effectivePerWalletLimit === 0n) return 0n;
+    if (effectivePerWalletLimit === MAX_UINT256) return MAX_UINT256;
+    const rem = effectivePerWalletLimit - (walletMintedInPhase ?? 0n);
+    return rem > 0n ? rem : 0n;
+  }, [effectivePerWalletLimit, walletMintedInPhase]);
+
   const maxClaimable = useMemo(() => {
     if (!activeClaimCondition) {
       return 0n;
@@ -87,7 +193,13 @@ export function DropClaim() {
         limits.push(phaseRemaining);
       }
     }
-    if (activeClaimCondition.quantityLimitPerWallet > 0n) {
+    // If there is a finite per-wallet limit in effect (snapshot override or global > 0),
+    // include the wallet-specific remaining even when it is 0 (fixes minted-out UX).
+    const finitePerWallet =
+      effectivePerWalletLimit > 0n && effectivePerWalletLimit !== MAX_UINT256;
+    if (finitePerWallet) {
+      limits.push(remainingForWallet);
+    } else if (activeClaimCondition.quantityLimitPerWallet > 0n) {
       limits.push(activeClaimCondition.quantityLimitPerWallet);
     }
     if (totalUnclaimed && totalUnclaimed > 0n) {
@@ -98,11 +210,11 @@ export function DropClaim() {
       return 100n;
     }
     return limits.reduce((min, value) => (value < min ? value : min));
-  }, [activeClaimCondition, totalUnclaimed]);
+  }, [activeClaimCondition, totalUnclaimed, remainingForWallet, effectivePerWalletLimit]);
 
   const maxQuantityNumber = useMemo(() => {
     if (maxClaimable <= 0n) {
-      return 1;
+      return 0;
     }
     const value = Number(maxClaimable);
     if (!Number.isFinite(value) || value <= 0) {
@@ -117,18 +229,54 @@ export function DropClaim() {
     }
   }, [maxQuantityNumber, quantity]);
 
-  // Use currency decimals from context instead of chain decimals
+  // Resolve effective currency/price (respect allowlist overrides)
+  const effectiveCurrencyAddress =
+    claimParamsQuery.data?.currency ?? activeClaimCondition?.currency;
+  const isWalletERC20 = useMemo(() => {
+    const addr = effectiveCurrencyAddress?.toLowerCase();
+    return (
+      !!addr &&
+      addr !== '0x0000000000000000000000000000000000000000' &&
+      addr !== NATIVE_TOKEN_ADDRESS
+    );
+  }, [effectiveCurrencyAddress]);
+
+  const walletCurrencyMetadataQuery = useQuery({
+    queryKey: [
+      'drop',
+      contract.address,
+      'currencyMeta',
+      effectiveCurrencyAddress?.toLowerCase() ?? 'native',
+    ],
+    queryFn: async () => {
+      if (!effectiveCurrencyAddress || !isWalletERC20) return null;
+      const currencyContract = getContract({
+        client,
+        chain: drop.chain,
+        address: effectiveCurrencyAddress,
+      });
+      const meta = await getCurrencyMetadata({ contract: currencyContract });
+      return meta;
+    },
+    enabled: Boolean(effectiveCurrencyAddress) && isWalletERC20,
+    staleTime: 60_000,
+  });
+
+  const effectiveCurrencySymbol = isWalletERC20
+    ? (walletCurrencyMetadataQuery.data?.symbol ?? currencySymbol)
+    : currencySymbol;
+  const effectiveCurrencyDecimals = isWalletERC20
+    ? (walletCurrencyMetadataQuery.data?.decimals ?? currencyDecimals)
+    : currencyDecimals;
+
+  const effectivePriceWei =
+    claimParamsQuery.data?.pricePerToken ?? activeClaimCondition?.pricePerToken ?? 0n;
   const pricePerToken =
-    activeClaimCondition?.pricePerToken && activeClaimCondition.pricePerToken > 0n
-      ? toTokens(activeClaimCondition.pricePerToken, currencyDecimals)
-      : '0';
-  const pricePerTokenDisplay =
-    activeClaimCondition?.pricePerToken && activeClaimCondition.pricePerToken > 0n
-      ? pricePerToken
-      : 'Free';
+    effectivePriceWei > 0n ? toTokens(effectivePriceWei, effectiveCurrencyDecimals) : '0';
+  const pricePerTokenDisplay = effectivePriceWei > 0n ? pricePerToken : 'Free';
   const totalPriceDisplay =
-    activeClaimCondition?.pricePerToken && activeClaimCondition.pricePerToken > 0n
-      ? toTokens(activeClaimCondition.pricePerToken * BigInt(quantity), currencyDecimals)
+    effectivePriceWei > 0n
+      ? toTokens(effectivePriceWei * BigInt(quantity), effectiveCurrencyDecimals)
       : 'Free';
 
   const isConnected = Boolean(account);
@@ -173,10 +321,30 @@ export function DropClaim() {
     if (!isDropReady) {
       return 'Drop is not live yet.';
     }
+    // If allowlist-gated and this wallet has no override, show not-allowlisted copy.
+    const merkle = activeClaimCondition?.merkleRoot?.toLowerCase?.() ?? '';
+    const isAllowlistGated = Boolean(merkle && !/^0x0+$/i.test(merkle));
+    if (isAllowlistGated && (!walletOverrideLimit || walletOverrideLimit <= 0n)) {
+      return 'Wallet is not on the allowlist for this drop.';
+    }
+    // If the wallet has exhausted a finite per-wallet allocation (snapshot/global), show minted-out copy.
+    if (walletOverrideLimit !== undefined && walletOverrideLimit > 0n && remainingForWallet === 0n) {
+      const eff = Number(walletOverrideLimit);
+      const plural = eff === 1 ? '' : 's';
+      return `You've already minted your maximum allocation (${eff} NFT${plural}). No more mints available for this wallet.`;
+    }
     if (eligibilityResult?.result) {
-      return `Wallet eligible. You can mint up to ${maxQuantityNumber} item${
-        maxQuantityNumber > 1 ? 's' : ''
-      }.`;
+      if (effectivePerWalletLimit === MAX_UINT256) {
+        return `Wallet eligible. You can mint up to ${maxQuantityNumber}.`;
+      }
+      const eff = Number(effectivePerWalletLimit);
+      const rem = Number(
+        remainingForWallet === MAX_UINT256 ? maxQuantityNumber : remainingForWallet
+      );
+      if (Number.isFinite(eff) && Number.isFinite(rem)) {
+        return `You can claim ${rem}/${eff}.`;
+      }
+      return `Wallet eligible. You can mint up to ${maxQuantityNumber}.`;
     }
     if (eligibilityResult?.reason) {
       return decodeEligibilityReason(eligibilityResult.reason);
@@ -190,14 +358,36 @@ export function DropClaim() {
     isDropReady,
     isSoldOut,
     maxQuantityNumber,
+    effectivePerWalletLimit,
+    remainingForWallet,
     drop.chain.name,
+    activeClaimCondition?.merkleRoot,
+    walletOverrideLimit,
   ]);
 
   const sharePath = `/drop/${drop.chain.id}/${drop.address}`;
 
-  const maxPerWalletLabel = activeClaimCondition
-    ? formatMaxPerWalletLabel(activeClaimCondition.quantityLimitPerWallet)
-    : null;
+  const maxPerWalletLabel = useMemo(() => {
+    if (!activeClaimCondition) return null;
+    const merkle = activeClaimCondition?.merkleRoot?.toLowerCase?.() ?? '';
+    const isAllowlistGated = Boolean(merkle && !/^0x0+$/i.test(merkle));
+    let base: string;
+    if (effectivePerWalletLimit === MAX_UINT256) {
+      base = 'Max per wallet: Unlimited';
+    } else if (effectivePerWalletLimit === 0n) {
+      base = isAllowlistGated ? 'Max per wallet: 0' : 'Max per wallet: Unlimited';
+    } else {
+      base = `Max per wallet: ${effectivePerWalletLimit.toString()}`;
+    }
+    if (effectivePerWalletLimit !== MAX_UINT256 && walletMintedInPhase !== undefined) {
+      const eff = Number(effectivePerWalletLimit);
+      const rem = Number(remainingForWallet === MAX_UINT256 ? eff : remainingForWallet);
+      if (Number.isFinite(eff) && Number.isFinite(rem)) {
+        return `${base} • You can claim ${rem}/${eff}`;
+      }
+    }
+    return base;
+  }, [activeClaimCondition, effectivePerWalletLimit, remainingForWallet, walletMintedInPhase]);
 
   const canClaimNow = Boolean(eligibilityResult?.result);
 
@@ -401,8 +591,8 @@ export function DropClaim() {
                         maxQuantity={maxQuantityNumber}
                         pricePerTokenDisplay={pricePerTokenDisplay}
                         totalPriceDisplay={totalPriceDisplay}
-                        currencySymbol={currencySymbol}
-                        currencyIcon={isERC20Currency ? '/erc20-icons/usdt0_logo.png' : undefined}
+                        currencySymbol={effectiveCurrencySymbol}
+                        currencyIcon={isWalletERC20 ? '/erc20-icons/usdt0_logo.png' : undefined}
                         eligibilityMessage={parsedEligibilityReason}
                         isCheckingEligibility={
                           eligibilityQuery.isLoading || eligibilityQuery.isFetching
@@ -426,7 +616,7 @@ export function DropClaim() {
                                 : parsedEligibilityReason
                             }
                             startsInSeconds={startsInSeconds}
-                            currencySymbol={currencySymbol}
+                            currencySymbol={effectiveCurrencySymbol}
                             totalPriceDisplay={totalPriceDisplay}
                             onConnect={handleConnect}
                             onSwitchChain={() => switchChain(drop.chain)}
@@ -519,7 +709,6 @@ function SocialIconLink({ platform, url }: { platform: string; url: string }) {
 }
 
 // Utilities and UI for Claim Conditions
-const MAX_UINT256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935n;
 
 function formatMaxPerWalletLabel(limit: bigint) {
   if (limit <= 0n || limit === MAX_UINT256) {
@@ -579,12 +768,6 @@ function ClaimConditionsPanel({
 }) {
   const nowSec = Math.floor(Date.now() / 1000);
   const [phaseNames, setPhaseNames] = useState<Record<number, string>>({});
-
-  console.log('claim conditions props', {
-    claimConditions,
-    phaseDeadlines,
-    activeStartTs,
-  });
 
   useEffect(() => {
     let cancelled = false;

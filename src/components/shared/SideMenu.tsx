@@ -59,7 +59,9 @@ export function SideMenu() {
               </Link>
               <Box opacity={0.5} cursor="not-allowed">
                 <Text>Leaderboard</Text>
-                <Text fontSize="xs" color="gray.500">Coming Soon</Text>
+                <Text fontSize="xs" color="gray.500">
+                  Coming Soon
+                </Text>
               </Box>
               {account && (
                 <Link href="/profile" onClick={onClose}>

@@ -213,10 +213,23 @@ export default function NftDropProvider({
     });
   }, [isERC20Currency, activeClaimCondition, drop.chain]);
 
+  // Provide a safe fallback contract object so the hook doesn't receive undefined.
+  const safeCurrencyContract = useMemo(
+    () =>
+      currencyContract ??
+      getContract({
+        client,
+        chain: drop.chain,
+        // zero address placeholder; query stays disabled when using this
+        address: '0x0000000000000000000000000000000000000000',
+      }),
+    [currencyContract, drop.chain]
+  );
+
   const { data: currencyMetadata, isLoading: isLoadingCurrencyMetadata } = useReadContract(
     getCurrencyMetadata,
     {
-      contract: currencyContract!,
+      contract: safeCurrencyContract,
       queryOptions: {
         enabled: !!currencyContract,
       },
