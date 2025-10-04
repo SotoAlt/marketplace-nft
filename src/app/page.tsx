@@ -198,9 +198,9 @@ function CollectionCard({ item }: { item: NftContract }) {
                 <HStack spacing={1}>
                   {floorDisplay && floorDisplay !== 'N/A' && (
                     <Box position="relative" width="14px" height="14px" flexShrink={0}>
-                      <Image 
-                        src="/erc20-icons/usdt0_logo.png" 
-                        alt="USDT0" 
+                      <Image
+                        src="/erc20-icons/usdt0_logo.png"
+                        alt="USDT0"
                         fill
                         sizes="14px"
                         style={{ objectFit: 'contain' }}
@@ -223,9 +223,9 @@ function CollectionCard({ item }: { item: NftContract }) {
                 <HStack spacing={1}>
                   {volumeDisplay && volumeDisplay !== 'N/A' && (
                     <Box position="relative" width="14px" height="14px" flexShrink={0}>
-                      <Image 
-                        src="/erc20-icons/usdt0_logo.png" 
-                        alt="USDT0" 
+                      <Image
+                        src="/erc20-icons/usdt0_logo.png"
+                        alt="USDT0"
                         fill
                         sizes="14px"
                         style={{ objectFit: 'contain' }}

@@ -1,12 +1,11 @@
 'use client';
 
-import { client } from '@/consts/client';
 import { useNftDropContext } from '@/hooks/useNftDropContext';
 import { Button, useToast } from '@chakra-ui/react';
 import { useState } from 'react';
-import { sendAndConfirmTransaction, getContract } from 'thirdweb';
+import { sendAndConfirmTransaction } from 'thirdweb';
 import { claimTo } from 'thirdweb/extensions/erc721';
-import { allowance, approve } from 'thirdweb/extensions/erc20';
+import { getApprovalForTransaction } from 'thirdweb/extensions/erc20';
 import type { Account } from 'thirdweb/wallets';
 
 export function ClaimAction({
@@ -45,7 +44,7 @@ export function ClaimAction({
   chainName: string;
 }) {
   const toast = useToast();
-  const { contract, refetch, isERC20Currency, currencyAddress, activeClaimCondition, drop } =
+  const { contract, refetch, isERC20Currency, currencyAddress, drop } =
     useNftDropContext();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
@@ -97,26 +96,22 @@ export function ClaimAction({
       if (!account) return;
       setIsProcessing(true);
       try {
-        // Check if ERC20 approval is needed
-        if (isERC20Currency && currencyAddress && activeClaimCondition) {
-          const tokenContract = getContract({
-            client,
-            chain: drop.chain,
-            address: currencyAddress,
+        // Prepare claim transaction once to reuse during optional approval + mint
+        const transaction = claimTo({
+          contract,
+          to: account.address,
+          from: account.address,
+          quantity: BigInt(quantity),
+        });
+
+        // Trigger ERC20 approval flow when necessary before minting
+        if (isERC20Currency && currencyAddress) {
+          const approvalTransaction = await getApprovalForTransaction({
+            transaction,
+            account,
           });
 
-          // Calculate total price
-          const totalPrice = activeClaimCondition.pricePerToken * BigInt(quantity);
-
-          // Check allowance
-          const currentAllowance = await allowance({
-            contract: tokenContract,
-            owner: account.address,
-            spender: contract.address,
-          });
-
-          // Request approval if needed
-          if (currentAllowance < totalPrice) {
+          if (approvalTransaction) {
             toast({
               title: 'Approval required',
               description: 'Approving token spending...',
@@ -125,12 +120,10 @@ export function ClaimAction({
               isClosable: true,
             });
 
-            const approveTransaction = approve({
-              contract: tokenContract,
-              spender: contract.address,
-              amount: totalPrice.toString(),
+            await sendAndConfirmTransaction({
+              transaction: approvalTransaction,
+              account,
             });
-            await sendAndConfirmTransaction({ transaction: approveTransaction, account });
 
             toast({
               title: 'Approval successful',
@@ -143,12 +136,6 @@ export function ClaimAction({
         }
 
         // Proceed with claiming
-        const transaction = claimTo({
-          contract,
-          to: account.address,
-          from: account.address,
-          quantity: BigInt(quantity),
-        });
         await sendAndConfirmTransaction({ transaction, account });
         toast({
           title: 'Mint successful',
@@ -205,6 +192,7 @@ function parseClaimError(error: unknown) {
     return 'Insufficient token balance. Please ensure you have enough USDT0 tokens.';
   }
   if (lower.includes('allowance') || lower.includes('approve')) {
+    console.log("lood", lower)
     return 'Token approval required. Please approve the contract to spend your tokens.';
   }
   if (lower.includes('allowlist') || lower.includes('not allowlisted')) {

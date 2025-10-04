@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  VStack,
-  Icon,
-} from '@chakra-ui/react';
+import { Box, Container, Heading, Text, VStack, Icon } from '@chakra-ui/react';
 import { FaExchangeAlt } from 'react-icons/fa';
 
 export default function SwapPage() {

@@ -4,7 +4,15 @@ import { Divider, Flex, HStack, Skeleton, Text, Box } from '@chakra-ui/react';
 import Image from 'next/image';
 import { useCollectionStats } from '@/hooks/useCollectionStats';
 
-function InlineStat({ label, value, showIcon }: { label: string; value: string; showIcon?: boolean }) {
+function InlineStat({
+  label,
+  value,
+  showIcon,
+}: {
+  label: string;
+  value: string;
+  showIcon?: boolean;
+}) {
   return (
     <Flex direction="column" minW="max-content">
       <Text fontSize="xs" color="gray.400">
@@ -13,9 +21,9 @@ function InlineStat({ label, value, showIcon }: { label: string; value: string; 
       <HStack spacing={1} align="center">
         {showIcon && value !== '-' && value !== 'N/A' && (
           <Box position="relative" width="18px" height="18px" flexShrink={0}>
-            <Image 
-              src="/erc20-icons/usdt0_logo.png" 
-              alt="USDT0" 
+            <Image
+              src="/erc20-icons/usdt0_logo.png"
+              alt="USDT0"
               fill
               sizes="18px"
               style={{ objectFit: 'contain' }}
