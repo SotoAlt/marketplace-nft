@@ -136,8 +136,28 @@ export function DropClaim() {
       });
       let total = 0n;
       for (const e of events) {
-        const qty = (e.args as any)?.quantityClaimed as bigint | undefined;
-        if (typeof qty === 'bigint') total += qty;
+        const rawQty = (e.args as Record<string, unknown> | undefined)?.quantityClaimed;
+        let qty: bigint | null = null;
+
+        if (typeof rawQty === 'bigint' || typeof rawQty === 'number' || typeof rawQty === 'string') {
+          qty = ensureBigInt(rawQty);
+        } else if (
+          rawQty &&
+          typeof rawQty === 'object' &&
+          'toString' in rawQty &&
+          typeof (rawQty as { toString: () => string }).toString === 'function'
+        ) {
+          try {
+            const formatted = (rawQty as { toString: () => string }).toString();
+            qty = ensureBigInt(formatted);
+          } catch {
+            qty = null;
+          }
+        }
+
+        if (qty !== null) {
+          total += qty;
+        }
       }
       return total;
     },
@@ -342,7 +362,10 @@ export function DropClaim() {
         remainingForWallet === MAX_UINT256 ? maxQuantityNumber : remainingForWallet
       );
       if (Number.isFinite(eff) && Number.isFinite(rem)) {
-        return `You can claim ${rem}/${eff}.`;
+        if (eff > 0 && rem < eff) {
+          return `You can claim ${rem}/${eff}.`;
+        }
+        return `Wallet eligible. You can mint up to ${eff}.`;
       }
       return `Wallet eligible. You can mint up to ${maxQuantityNumber}.`;
     }
@@ -382,7 +405,7 @@ export function DropClaim() {
     if (effectivePerWalletLimit !== MAX_UINT256 && walletMintedInPhase !== undefined) {
       const eff = Number(effectivePerWalletLimit);
       const rem = Number(remainingForWallet === MAX_UINT256 ? eff : remainingForWallet);
-      if (Number.isFinite(eff) && Number.isFinite(rem)) {
+      if (Number.isFinite(eff) && Number.isFinite(rem) && eff > 0 && rem < eff) {
         return `${base} • You can claim ${rem}/${eff}`;
       }
     }
