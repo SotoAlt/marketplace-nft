@@ -91,24 +91,26 @@ export function Collection() {
               />
             </Box>
             <Flex direction="column" gap={1} minW={0}>
-              <HStack spacing={3} align="center">
-                <Heading
-                  size="lg"
-                  lineHeight={1.1}
-                  noOfLines={1}
-                  textAlign={{ base: 'left', md: 'left' }}
-                >
-                  {contractMetadata?.name || 'Unknown collection'}
-                </Heading>
+              <Heading
+                size="lg"
+                lineHeight={1.1}
+                noOfLines={1}
+                textAlign={{ base: 'left', md: 'left' }}
+                fontFamily="var(--font-roboto)"
+                fontWeight="600"
+              >
+                {contractMetadata?.name || 'Unknown collection'}
+              </Heading>
+              <HStack spacing={2} align="center">
+                <Text fontSize="sm" color="gray.400" noOfLines={1}>
+                  {shortenAddress(nftContract.address)}
+                </Text>
                 <CollectionSocials 
                   twitter={socialLinks.twitter}
                   discord={socialLinks.discord}
                   website={socialLinks.website}
                 />
               </HStack>
-              <Text fontSize="sm" color="gray.400" noOfLines={1}>
-                {shortenAddress(nftContract.address)}
-              </Text>
               {contractMetadata?.description && (
                 <Text maxW={{ base: '320px', md: '420px' }} color="gray.400" noOfLines={2}>
                   {contractMetadata.description}
@@ -121,13 +123,18 @@ export function Collection() {
         {/* Right: Stats aligned to the right of image */}
         <Flex flex="1" align="flex-end">
           <CollectionStats />
-          <Box ml={{ base: 0, md: 4, lg: 6 }} mr={{ base: 0, md: 4, lg: 6 }}>
-            <ListingHelpDialog />
-          </Box>
         </Flex>
       </Flex>
 
-      <Tabs mt={12} variant={'enclosed-colored'} isFitted isLazy defaultIndex={0}>
+      <Flex justify="space-between" align="center" mt={12} mb={4}>
+        <Box flex="1">
+        </Box>
+        <Box>
+          <ListingHelpDialog />
+        </Box>
+      </Flex>
+      
+      <Tabs variant={'enclosed-colored'} isFitted isLazy defaultIndex={0}>
         <TabList>
           <Tab>Listings ({listingsInSelectedCollection.length || 0})</Tab>
           <Tab>

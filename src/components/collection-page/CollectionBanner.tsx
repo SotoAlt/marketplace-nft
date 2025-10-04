@@ -10,7 +10,6 @@ export function CollectionBanner() {
       width="100%"
       height={{ base: '200px', md: '250px', lg: '300px' }}
       overflow="hidden"
-      mb={6}
     >
       <Image
         src="/images/pretrillions-banner.png"
@@ -19,7 +18,7 @@ export function CollectionBanner() {
         priority
         style={{
           objectFit: 'cover',
-          objectPosition: 'center',
+          objectPosition: 'top',
         }}
         sizes="100vw"
       />
