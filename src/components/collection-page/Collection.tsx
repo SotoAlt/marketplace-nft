@@ -59,19 +59,39 @@ export function Collection() {
   const thumbnailImage =
     contractMetadata?.image || firstNFT?.metadata.image || NFT_PLACEHOLDER_IMAGE;
   
-  // Extract social links from contract metadata
-  const socialLinks = {
-    twitter: (contractMetadata as any)?.external_link?.includes('twitter.com') 
-      ? (contractMetadata as any)?.external_link 
-      : (contractMetadata as any)?.twitter,
-    discord: (contractMetadata as any)?.discord,
-    website: (contractMetadata as any)?.external_link || (contractMetadata as any)?.website,
+  // Hardcoded social links per collection contract address
+  const getSocialLinks = (contractAddress: string) => {
+    const address = contractAddress.toLowerCase();
+    
+    // PRETRILLIONS collection
+    if (address === '0xb4ab5b0a52432ea35030459958059a7b31e191c4') {
+      return {
+        twitter: 'https://x.com/remi_online_',
+        discord: 'https://discord.gg/pretrillions',
+      };
+    }
+    
+    // PRE-TEST collection  
+    if (address === '0xcdcdf097d989073b4181a764dfa7310898b6bde4') {
+      return {
+        twitter: 'https://x.com/remi_online_',
+        discord: 'https://discord.gg/pretrillions',
+      };
+    }
+    
+    // Default - no socials
+    return {
+      twitter: undefined,
+      discord: undefined,
+    };
   };
+
+  const socialLinks = getSocialLinks(nftContract.address);
 
   return (
     <>
       <CollectionBanner />
-      <Box mt="24px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
+      <Box mt="12px" maxW="7xl" mx="auto" px={{ base: 4, md: 8 }}>
       <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 10 }} align="stretch">
         {/* Left: Image + Title + Description */}
         <Flex w={{ base: 'full', md: 'fit-content' }} flexShrink={0} align="flex-start">
@@ -108,7 +128,6 @@ export function Collection() {
                 <CollectionSocials 
                   twitter={socialLinks.twitter}
                   discord={socialLinks.discord}
-                  website={socialLinks.website}
                 />
               </HStack>
               {contractMetadata?.description && (

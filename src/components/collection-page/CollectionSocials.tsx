@@ -1,16 +1,15 @@
 'use client';
 
 import { HStack, IconButton, Link, Tooltip } from '@chakra-ui/react';
-import { FaXTwitter, FaDiscord, FaGlobe } from 'react-icons/fa6';
+import { FaXTwitter, FaDiscord } from 'react-icons/fa6';
 
 interface CollectionSocialsProps {
   twitter?: string;
   discord?: string;
-  website?: string;
 }
 
-export function CollectionSocials({ twitter, discord, website }: CollectionSocialsProps) {
-  if (!twitter && !discord && !website) return null;
+export function CollectionSocials({ twitter, discord }: CollectionSocialsProps) {
+  if (!twitter && !discord) return null;
 
   return (
     <HStack spacing={2}>
@@ -38,21 +37,6 @@ export function CollectionSocials({ twitter, discord, website }: CollectionSocia
             rel="noopener noreferrer"
             aria-label="Discord"
             icon={<FaDiscord />}
-            variant="ghost"
-            size="sm"
-            _hover={{ bg: 'whiteAlpha.200' }}
-          />
-        </Tooltip>
-      )}
-      {website && (
-        <Tooltip label="Website" placement="bottom">
-          <IconButton
-            as={Link}
-            href={website}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Website"
-            icon={<FaGlobe />}
             variant="ghost"
             size="sm"
             _hover={{ bg: 'whiteAlpha.200' }}

@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Container, HStack, IconButton, Link, Stack, Text } from '@chakra-ui/react';
-import { FaXTwitter, FaDiscord, FaGlobe } from 'react-icons/fa6';
+import { FaXTwitter, FaDiscord } from 'react-icons/fa6';
 
 export function Footer() {
   return (
@@ -20,7 +20,7 @@ export function Footer() {
             <HStack spacing={2}>
               <IconButton
                 as={Link}
-                href="https://x.com/remi"
+                href="https://x.com/remi_online_"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"
@@ -31,22 +31,11 @@ export function Footer() {
               />
               <IconButton
                 as={Link}
-                href="https://discord.gg/remi"
+                href="https://discord.gg/pretrillions"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Discord"
                 icon={<FaDiscord />}
-                variant="ghost"
-                size="sm"
-                _hover={{ bg: 'whiteAlpha.200' }}
-              />
-              <IconButton
-                as={Link}
-                href="https://remi.online"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Website"
-                icon={<FaGlobe />}
                 variant="ghost"
                 size="sm"
                 _hover={{ bg: 'whiteAlpha.200' }}
