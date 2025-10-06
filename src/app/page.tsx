@@ -40,7 +40,7 @@ export default function Home() {
       {/* Hero Section */}
       <VStack spacing={8} align="center" textAlign="center" mb={16}>
         <VStack spacing={4}>
-          <Heading as="h1" size="2xl">
+          <Heading as="h1" size="2xl" fontFamily="var(--font-pixelify), sans-serif">
             Co-create and trade AI-native NFTs
           </Heading>
         </VStack>
