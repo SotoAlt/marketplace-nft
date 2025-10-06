@@ -51,7 +51,7 @@ export default function Home() {
       {/* Featured Collections Section */}
       <VStack spacing={8} align="stretch">
         <Box>
-          <Heading as="h2" size="xl" mb={2}>
+          <Heading as="h2" size="xl" mb={2} fontFamily="var(--font-pixelify), sans-serif">
             Featured Collections
           </Heading>
         </Box>
@@ -66,7 +66,7 @@ export default function Home() {
       {/* Drops Section */}
       <VStack spacing={8} align="stretch" mt={16}>
         <Box>
-          <Heading as="h2" size="xl" mb={2}>
+          <Heading as="h2" size="xl" mb={2} fontFamily="var(--font-pixelify), sans-serif">
             Featured Drops
           </Heading>
         </Box>

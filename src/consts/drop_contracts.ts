@@ -40,6 +40,18 @@ const baseDropContracts: DropContract[] = [
       1760121600, // 2025-10-10T00:00:00Z
     ],
   },
+  {
+    address: '0x0ff6740cc055FbB5343fDD425E3722305d25BB63',
+    chain: plasma,
+    type: 'DropERC721',
+    title: 'TEST RANDOM',
+    description: 'Claim experimental Plasma drop tokens while supplies last.',
+    thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
+    slug: 'test-random-drop-nft',
+    phaseDeadlines: [
+      1760121600, // 2025-10-10T00:00:00Z
+    ],
+  },
 ];
 
 const testnetDropContracts: DropContract[] = [
