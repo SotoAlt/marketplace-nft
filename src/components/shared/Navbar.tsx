@@ -41,13 +41,22 @@ export function Navbar() {
             bgClip="text"
             fontWeight="extrabold"
           >
-            <Image src="/remi-logo.png" alt="remi" aspectRatio={4 / 3} width="100px" />
+            <Image src="/remi-logo.svg" alt="remi" width="100px" height="auto" />
           </Heading>
         </Flex>
         <Box display={{ lg: 'block', base: 'none' }}>
-          <Button as={Link} href="/swap" variant="ghost" mr="10px">
-            Swap
-          </Button>
+          <Tooltip label="You will be redirected to a DEX aggregator" placement="bottom">
+            <Button 
+              as={Link} 
+              href="https://dapp.gluex.xyz/?fromChain=9745&fromToken=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&toChain=9745&toToken=0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb"
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="ghost" 
+              mr="10px"
+            >
+              Swap
+            </Button>
+          </Tooltip>
           <Button as={Link} href="/faq" variant="ghost" mr="10px">
             FAQ
           </Button>
