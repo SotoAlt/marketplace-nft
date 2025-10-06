@@ -39,6 +39,15 @@ const baseNftContracts: NftContract[] = [
     thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
     slug: 'pre-test-nft',
   },
+  {
+    address: '0x0ff6740cc055FbB5343fDD425E3722305d25BB63',
+    chain: plasma,
+    type: 'ERC721',
+    title: 'TEST RANDOM',
+    description: 'Claim experimental Plasma drop tokens while supplies last.',
+    thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
+    slug: 'test-random-nft',
+  },
 ];
 
 const testnetNftContracts: NftContract[] = [

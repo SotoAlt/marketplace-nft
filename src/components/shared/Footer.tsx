@@ -42,7 +42,7 @@ export function Footer() {
               />
             </HStack>
           </HStack>
-          <Text fontSize="sm">Built for curious collectors and forward-thinking creators.</Text>
+          <Text fontSize="sm">Home of pretrillions</Text>
         </Stack>
       </Container>
     </Box>

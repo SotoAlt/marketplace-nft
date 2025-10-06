@@ -79,6 +79,14 @@ export function Collection() {
       };
     }
     
+    // TEST RANDOM collection
+    if (address === '0x0ff6740cc055fbb5343fdd425e3722305d25bb63') {
+      return {
+        twitter: 'https://x.com/remi_online_',
+        discord: 'https://discord.gg/pretrillions',
+      };
+    }
+    
     // Default - no socials
     return {
       twitter: undefined,

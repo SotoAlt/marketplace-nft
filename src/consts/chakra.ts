@@ -22,8 +22,8 @@ export const chakraTheme = extendTheme({
     },
     Heading: {
       baseStyle: {
-        fontFamily: 'var(--font-pixelify), sans-serif',
-        fontWeight: 'normal',
+        fontFamily: 'var(--font-roboto), sans-serif',
+        fontWeight: '600',
       },
     },
     Stat: {
@@ -32,7 +32,8 @@ export const chakraTheme = extendTheme({
           fontFamily: 'var(--font-roboto), sans-serif',
         },
         number: {
-          fontFamily: 'var(--font-pixelify), sans-serif',
+          fontFamily: 'var(--font-roboto), sans-serif',
+          fontWeight: '700',
         },
       },
     },
