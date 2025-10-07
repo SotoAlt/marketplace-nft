@@ -23,7 +23,7 @@ const baseDropContracts: DropContract[] = [
     title: 'PRETRILLIONS',
     description: 'Claim experimental Plasma drop tokens while supplies last.',
     thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
-    slug: 'pretrillions-drop-nft',
+    slug: 'pretrillions',
     phaseDeadlines: [
       1760121600, // 2025-10-10T00:00:00Z
     ],

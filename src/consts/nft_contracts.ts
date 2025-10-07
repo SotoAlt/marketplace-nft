@@ -28,7 +28,7 @@ const baseNftContracts: NftContract[] = [
     title: 'PRETRILLIONS',
     description: 'Claim experimental Plasma drop tokens while supplies last.',
     thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
-    slug: 'pretrillions-nft',
+    slug: 'pretrillions',
   },
   {
     address: '0xCDCDf097D989073B4181A764dfa7310898B6Bde4',
