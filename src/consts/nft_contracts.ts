@@ -22,7 +22,7 @@ export type NftContract = {
  */
 const baseNftContracts: NftContract[] = [
   {
-    address: '0xB4ab5b0A52432eA35030459958059a7B31E191C4',
+    address: '0x4633B5f2F84C5506AE3979d1eeB5E58C912CFA5B',
     chain: plasma,
     type: 'ERC721',
     title: 'PRETRILLIONS',
