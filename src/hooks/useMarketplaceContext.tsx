@@ -64,7 +64,6 @@ export default function MarketplaceProvider({
   let _chainId: number;
   try {
     _chainId = Number.parseInt(chainId);
-    console.log('MarketplaceProvider debug:', { slug, contractAddress, chainId, _chainId });
   } catch (err) {
     throw new Error('Invalid chain ID');
   }
@@ -87,18 +86,12 @@ export default function MarketplaceProvider({
     return false;
   });
 
-  console.log('MarketplaceProvider collectionSupported:', collectionSupported);
-  console.log('Available NFT_CONTRACTS:', NFT_CONTRACTS.map(c => ({ slug: c.slug, address: c.address, chainId: c.chain.id })));
-
   // Resolve the actual contract address from slug if needed
   const resolvedContractAddress = slug 
     ? collectionSupported?.address 
     : contractAddress;
 
-  console.log('MarketplaceProvider resolvedContractAddress:', resolvedContractAddress);
-
   if (!resolvedContractAddress) {
-    console.error('Contract resolution failed:', { slug, contractAddress, collectionSupported });
     throw new Error('Contract address could not be resolved');
   }
   // You can remove this condition if you want to supported _any_ nft collection

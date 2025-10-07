@@ -14,6 +14,9 @@ import {
   TabPanels,
   Tabs,
   Text,
+  IconButton,
+  useClipboard,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
 import { ListingsTabContent } from './ListingsTabContent';
@@ -25,6 +28,7 @@ import { shortenAddress } from 'thirdweb/utils';
 import { useOwnedNfts } from '@/hooks/useOwnedNfts';
 import { OwnedNftsPanel } from './OwnedNftsPanel';
 import ListingHelpDialog from '@/components/shared/ListingHelpDialog';
+import { IoCopy, IoCheckmark } from 'react-icons/io5';
 
 export function Collection() {
   const {
@@ -63,24 +67,8 @@ export function Collection() {
   const getSocialLinks = (contractAddress: string) => {
     const address = contractAddress.toLowerCase();
     
-    // PRETRILLIONS collection
-    if (address === '0xb4ab5b0a52432ea35030459958059a7b31e191c4') {
-      return {
-        twitter: 'https://x.com/remi_online_',
-        discord: 'https://discord.gg/pretrillions',
-      };
-    }
-    
-    // PRE-TEST collection  
-    if (address === '0xcdcdf097d989073b4181a764dfa7310898b6bde4') {
-      return {
-        twitter: 'https://x.com/remi_online_',
-        discord: 'https://discord.gg/pretrillions',
-      };
-    }
-    
-    // TEST RANDOM collection
-    if (address === '0x0ff6740cc055fbb5343fdd425e3722305d25bb63') {
+    // PRETRILLIONS collection (official contract)
+    if (address === '0x4633b5f2f84c5506ae3979d1eeb5e58c912cfa5b') {
       return {
         twitter: 'https://x.com/remi_online_',
         discord: 'https://discord.gg/pretrillions',
@@ -95,6 +83,7 @@ export function Collection() {
   };
 
   const socialLinks = getSocialLinks(nftContract.address);
+  const { hasCopied, onCopy } = useClipboard(nftContract.address);
 
   return (
     <>
@@ -130,9 +119,22 @@ export function Collection() {
                 {contractMetadata?.name || 'Unknown collection'}
               </Heading>
               <HStack spacing={2} align="center">
-                <Text fontSize="sm" color="gray.400" noOfLines={1}>
-                  {shortenAddress(nftContract.address)}
-                </Text>
+                <HStack spacing={1} align="center">
+                  <Text fontSize="sm" color="gray.400" noOfLines={1}>
+                    {shortenAddress(nftContract.address)}
+                  </Text>
+                  <Tooltip label={hasCopied ? "Copied!" : "Copy contract address"} placement="top">
+                    <IconButton
+                      aria-label="Copy contract address"
+                      icon={hasCopied ? <IoCheckmark /> : <IoCopy />}
+                      size="xs"
+                      variant="ghost"
+                      color={hasCopied ? "green.400" : "gray.400"}
+                      _hover={{ color: hasCopied ? "green.300" : "gray.300" }}
+                      onClick={onCopy}
+                    />
+                  </Tooltip>
+                </HStack>
                 <CollectionSocials 
                   twitter={socialLinks.twitter}
                   discord={socialLinks.discord}
