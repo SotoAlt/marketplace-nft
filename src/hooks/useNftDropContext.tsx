@@ -86,7 +86,8 @@ export default function NftDropProvider({
   const drop = DROP_CONTRACTS.find(
     (entry) =>
       entry.chain.id === parsedChainId &&
-      entry.address.toLowerCase() === contractAddress.toLowerCase()
+      (entry.address.toLowerCase() === contractAddress.toLowerCase() ||
+       entry.slug === `${contractAddress}-drop-nft`)
   );
 
   if (!drop) {

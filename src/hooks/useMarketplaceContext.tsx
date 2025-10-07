@@ -72,7 +72,9 @@ export default function MarketplaceProvider({
 
   const collectionSupported = NFT_CONTRACTS.find(
     (item) =>
-      item.address.toLowerCase() === contractAddress.toLowerCase() && item.chain.id === _chainId
+      (item.address.toLowerCase() === contractAddress.toLowerCase() ||
+       item.slug === `${contractAddress}-nft`) && 
+      item.chain.id === _chainId
   );
   // You can remove this condition if you want to supported _any_ nft collection
   // or you can update the entries in `NFT_CONTRACTS`
