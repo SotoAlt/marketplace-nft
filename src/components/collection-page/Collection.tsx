@@ -70,7 +70,7 @@ export function Collection() {
     // PRETRILLIONS collection (official contract)
     if (address === '0x4633b5f2f84c5506ae3979d1eeb5e58c912cfa5b') {
       return {
-        twitter: 'https://x.com/remi_online_',
+        twitter: 'https://x.com/pretrillions',
         discord: 'https://discord.gg/pretrillions',
       };
     }
