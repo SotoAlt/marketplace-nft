@@ -6,10 +6,10 @@ export default function DropLayout({
   params,
 }: {
   children: ReactNode;
-  params: { chainId: string; contractAddress: string };
+  params: { chainId: string; slug: string };
 }) {
   return (
-    <NftDropProvider chainId={params.chainId} contractAddress={params.contractAddress}>
+    <NftDropProvider chainId={params.chainId} slug={params.slug}>
       {children}
     </NftDropProvider>
   );

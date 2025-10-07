@@ -1,4 +1,5 @@
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
+import { NFT_CONTRACTS } from '@/consts/nft_contracts';
 import {
   AccordionButton,
   AccordionIcon,
@@ -17,6 +18,14 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
       o.id !== excludedListingId &&
       o.assetContractAddress.toLowerCase() === nftContract.address.toLowerCase()
   );
+  
+  // Find the NFT contract config to get the slug
+  const nftContractConfig = NFT_CONTRACTS.find(
+    (config) =>
+      config.address.toLowerCase() === nftContract.address.toLowerCase() &&
+      config.chain.id === nftContract.chain.id
+  );
+  
   if (!listings || !listings.length) return <></>;
   return (
     <AccordionItem>
@@ -57,7 +66,7 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
           ))}
         </Box>
         <Box _hover={{ textDecoration: 'underline' }} textAlign="center" mt={4}>
-          <Link href={`/collection/${nftContract.chain.id}/${nftContract.address}`}>View all</Link>
+          <Link href={`/collection/${nftContract.chain.id}/${nftContractConfig?.slug || nftContract.address}`}>View all</Link>
         </Box>
       </AccordionPanel>
     </AccordionItem>

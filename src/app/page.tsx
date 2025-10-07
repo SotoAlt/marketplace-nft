@@ -115,7 +115,7 @@ function CollectionCard({ item }: { item: NftContract }) {
   const { floorDisplay, volumeDisplay, isLoading } = useCollectionCardStats(item);
 
   return (
-    <Link href={`/collection/${item.chain.id.toString()}/${item.address}`}>
+    <Link href={`/collection/${item.chain.id.toString()}/${item.slug || item.address}`}>
       <Box
         _hover={{
           textDecoration: 'none',
@@ -368,7 +368,7 @@ function DropRow({ drop }: { drop: DropContract }) {
           <Box mt="auto">
             <Button
               as={Link}
-              href={`/drop/${drop.chain.id}/${drop.address}`}
+              href={`/drop/${drop.chain.id}/${drop.slug || drop.address}`}
               variant="outline"
               colorScheme="purple"
               borderColor="gray.600"

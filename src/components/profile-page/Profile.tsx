@@ -117,7 +117,7 @@ export function ProfileSection(props: Props) {
                   </TabList>
                 </Tabs>
                 <Link
-                  href={`/collection/${selectedCollection.chain.id}/${selectedCollection.address}`}
+                  href={`/collection/${selectedCollection.chain.id}/${selectedCollection.slug || selectedCollection.address}`}
                   color="gray"
                 >
                   View collection <ExternalLinkIcon mx="2px" />
