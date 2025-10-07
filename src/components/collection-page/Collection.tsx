@@ -63,7 +63,15 @@ export function Collection() {
   const getSocialLinks = (contractAddress: string) => {
     const address = contractAddress.toLowerCase();
     
-    // PRETRILLIONS collection
+    // PRETRILLIONS collection (official)
+    if (address === '0x4633b5f2f84c5506ae3979d1eeb5e58c912cfa5b') {
+      return {
+        twitter: 'https://x.com/remi_online_',
+        discord: 'https://discord.gg/pretrillions',
+      };
+    }
+    
+    // PRETRILLIONS collection (old)
     if (address === '0xb4ab5b0a52432ea35030459958059a7b31e191c4') {
       return {
         twitter: 'https://x.com/remi_online_',

@@ -17,13 +17,25 @@ export type DropContract = {
 
 const baseDropContracts: DropContract[] = [
   {
-    address: '0xB4ab5b0A52432eA35030459958059a7B31E191C4',
+    address: '0x4633B5f2F84C5506AE3979d1eeB5E58C912CFA5B',
     chain: plasma,
     type: 'DropERC721',
     title: 'PRETRILLIONS',
     description: 'Claim experimental Plasma drop tokens while supplies last.',
     thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
     slug: 'pretrillions-drop-nft',
+    phaseDeadlines: [
+      1760121600, // 2025-10-10T00:00:00Z
+    ],
+  },
+  {
+    address: '0xB4ab5b0A52432eA35030459958059a7B31E191C4',
+    chain: plasma,
+    type: 'DropERC721',
+    title: 'PRETRILLIONS-OLD',
+    description: 'Claim experimental Plasma drop tokens while supplies last.',
+    thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
+    slug: 'pretrillions-old-drop-nft',
     phaseDeadlines: [
       1760121600, // 2025-10-10T00:00:00Z
     ],
