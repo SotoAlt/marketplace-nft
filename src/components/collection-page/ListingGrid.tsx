@@ -1,6 +1,7 @@
 'use client';
 import { type DirectListing } from 'thirdweb/extensions/marketplace';
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
+import { NFT_CONTRACTS } from '@/consts/nft_contracts';
 import { SimpleGrid, useBreakpointValue } from '@chakra-ui/react';
 import { NFTCard } from './NFTCard';
 
@@ -10,6 +11,14 @@ type ListingGridProps = {
 
 export function ListingGrid({ listings = [] }: ListingGridProps) {
   const { nftContract } = useMarketplaceContext();
+  
+  // Find the NFT contract config to get the slug
+  const nftContractConfig = NFT_CONTRACTS.find(
+    (config) =>
+      config.address.toLowerCase() === nftContract.address.toLowerCase() &&
+      config.chain.id === nftContract.chain.id
+  );
+  
   const len = listings.length;
   const columns = useBreakpointValue({
     base: 1,
@@ -32,7 +41,7 @@ export function ListingGrid({ listings = [] }: ListingGridProps) {
           }}
           contract={nftContract}
           href={`/collection/${nftContract.chain.id}/${
-            nftContract.address
+            nftContractConfig?.slug || nftContract.address
           }/token/${item.asset.id.toString()}`}
           showPrice={true}
           price={{

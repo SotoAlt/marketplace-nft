@@ -54,7 +54,7 @@ export default function RelatedListings({ excludedListingId }: { excludedListing
                   borderWidth: 0,
                 }}
                 href={`/collection/${nftContract.chain.id}/${
-                  nftContract.address
+                  nftContractConfig?.slug || nftContract.address
                 }/token/${item.asset.id.toString()}`}
                 showPrice
                 price={{

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMarketplaceContext } from '@/hooks/useMarketplaceContext';
+import { NFT_CONTRACTS } from '@/consts/nft_contracts';
 import { Box, Flex, SimpleGrid, useBreakpointValue, Text, Button } from '@chakra-ui/react';
 import { useState } from 'react';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from 'react-icons/md';
@@ -14,6 +15,13 @@ export function AllNftsGrid() {
   const [itemsPerPage] = useState<number>(20);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
   const { nftContract, type, supplyInfo } = useMarketplaceContext();
+  
+  // Find the NFT contract config to get the slug
+  const nftContractConfig = NFT_CONTRACTS.find(
+    (config) =>
+      config.address.toLowerCase() === nftContract.address.toLowerCase() &&
+      config.chain.id === nftContract.chain.id
+  );
   const startTokenId = supplyInfo?.startTokenId ?? 0n;
   const totalItems: bigint = supplyInfo ? supplyInfo.endTokenId - supplyInfo.startTokenId + 1n : 0n;
   const numberOfPages: number = Number(
@@ -55,7 +63,7 @@ export function AllNftsGrid() {
               }}
               contract={nftContract}
               href={`/collection/${nftContract.chain.id}/${
-                nftContract.address
+                nftContractConfig?.slug || nftContract.address
               }/token/${item.id.toString()}`}
               showPrice={false}
               index={index}
