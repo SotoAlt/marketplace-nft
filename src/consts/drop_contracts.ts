@@ -28,6 +28,18 @@ const baseDropContracts: DropContract[] = [
       1760121600, // 2025-10-10T00:00:00Z
     ],
   },
+  {
+    address: '0xB4ab5b0A52432eA35030459958059a7B31E191C4',
+    chain: plasma,
+    type: 'DropERC721',
+    title: 'PRETRILLIONS Test',
+    description: 'Testing collection for original PRETRILLIONS contract.',
+    thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
+    slug: 'pre-test-final',
+    phaseDeadlines: [
+      1760121600, // 2025-10-10T00:00:00Z
+    ],
+  },
 ];
 
 const testnetDropContracts: DropContract[] = [
