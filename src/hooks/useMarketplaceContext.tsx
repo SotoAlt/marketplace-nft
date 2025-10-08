@@ -6,7 +6,7 @@ import { NFT_CONTRACTS } from '@/consts/nft_contracts';
 import { SUPPORTED_TOKENS, Token } from '@/consts/supported_tokens';
 import { getSupplyInfo, SupplyInfo } from '@/extensions/getLargestCirculatingTokenId';
 import { Box, Spinner } from '@chakra-ui/react';
-import { createContext, type ReactNode, useContext } from 'react';
+import { createContext, type ReactNode, useContext, useEffect } from 'react';
 import { getContract, type ThirdwebContract } from 'thirdweb';
 import { getContractMetadata } from 'thirdweb/extensions/common';
 import { isERC1155 } from 'thirdweb/extensions/erc1155';
@@ -143,12 +143,21 @@ export default function MarketplaceProvider({
     isLoading: isLoadingValidListings,
     refetch: refetchAllListings,
     isRefetching: isRefetchingAllListings,
+    error: allValidListingsError,
   } = useReadContract(getAllValidListings, {
     contract: marketplace,
+    start: 0,
+    count: 5000n,
     queryOptions: {
       enabled: isNftCollection,
     },
   });
+
+  useEffect(() => {
+    if (allValidListingsError) {
+      console.error('[MarketplaceContext] Failed to fetch listings', allValidListingsError);
+    }
+  }, [allValidListingsError]);
 
   const listingsInSelectedCollection = allValidListings?.length
     ? allValidListings.filter(

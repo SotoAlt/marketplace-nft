@@ -51,7 +51,7 @@ type Props = {
 };
 
 export function Token(props: Props) {
-  const { type, nftContract, contractMetadata, listingsInSelectedCollection } =
+  const { type, nftContract, contractMetadata, listingsInSelectedCollection, marketplaceContract } =
     useMarketplaceContext();
   const { tokenId } = props;
   const account = useActiveAccount();
@@ -71,11 +71,16 @@ export function Token(props: Props) {
     },
   });
 
-  const listings = (listingsInSelectedCollection || []).filter(
-    (item) =>
-      item.assetContractAddress.toLowerCase() === nftContract.address.toLowerCase() &&
-      item.asset.id === BigInt(tokenId)
-  );
+  const listings = (listingsInSelectedCollection || []).filter((item) => {
+    const sameContract =
+      item.assetContractAddress.toLowerCase() === nftContract.address.toLowerCase();
+    const sameToken =
+      item.asset?.id !== undefined && item.asset?.id !== null
+        ? item.asset.id === tokenId
+        : item.tokenId === tokenId;
+
+    return sameContract && sameToken;
+  });
 
   const accountAddress = account?.address?.toLowerCase();
   const ownedByYou = nft?.owner?.toLowerCase() === accountAddress;
@@ -91,7 +96,6 @@ export function Token(props: Props) {
           return currentPrice < lowestPrice ? current : lowest;
         })
       : null;
-
   return (
     <Container maxW="7xl" py={8} minH="100vh">
       <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={8} alignItems="start">
