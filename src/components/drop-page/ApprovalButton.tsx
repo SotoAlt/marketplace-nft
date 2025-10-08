@@ -72,7 +72,7 @@ export function ApprovalButton({
         const approvalTransaction = approve({
           contract: usdtContract,
           spender: contract.address,
-          amount: APPROVAL_AMOUNT,
+          amount: APPROVAL_AMOUNT.toString(),
         });
 
         toast({
