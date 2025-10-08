@@ -30,8 +30,8 @@ export function ApprovalButton({
   const [isApproving, setIsApproving] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
 
-  // USDT0 has 6 decimals, so 100 USDT0 = 100 * 10^6
-  const APPROVAL_AMOUNT = 100n * 10n ** 6n;
+  // USDT0 has 6 decimals, so 100 USDT0 = 100 * 10^6 = 100,000,000
+  const APPROVAL_AMOUNT = 100n * 1000000n; // 100 USDT0 tokens
 
   let buttonLabel = 'Approve 100 USDT0';
   let onClick: (() => Promise<void> | void) | undefined;
