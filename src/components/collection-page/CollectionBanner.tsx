@@ -18,7 +18,7 @@ export function CollectionBanner() {
         priority
         style={{
           objectFit: 'cover',
-          objectPosition: 'top',
+          objectPosition: 'center 20%',
         }}
         sizes="100vw"
       />
