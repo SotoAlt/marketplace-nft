@@ -54,7 +54,7 @@ export function ApprovalButton({
     buttonLabel = 'Drop not live';
     isDisabled = true;
   } else if (!isERC20Currency || !currencyAddress) {
-    buttonLabel = 'No approval needed';
+    buttonLabel = 'Approve 100 USDT0';
     isDisabled = true;
   } else {
     onClick = async () => {
@@ -110,10 +110,7 @@ export function ApprovalButton({
     };
   }
 
-  // Don't show the button if it's not an ERC20 currency
-  if (!isERC20Currency || !currencyAddress) {
-    return null;
-  }
+  // Always show the button for better UX
 
   const isLoading = isApproving || isSwitching;
 
