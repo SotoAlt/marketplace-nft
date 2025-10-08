@@ -53,10 +53,12 @@ const MarketplaceContext = createContext<TMarketplaceContext | undefined>(undefi
 export default function MarketplaceProvider({
   chainId,
   contractAddress,
+  slug,
   children,
 }: {
   chainId: string;
-  contractAddress: string;
+  contractAddress?: string;
+  slug?: string;
   children: ReactNode;
 }) {
   let _chainId: number;
@@ -70,10 +72,28 @@ export default function MarketplaceProvider({
     throw new Error('Marketplace not supported on this chain');
   }
 
-  const collectionSupported = NFT_CONTRACTS.find(
-    (item) =>
-      item.address.toLowerCase() === contractAddress.toLowerCase() && item.chain.id === _chainId
-  );
+  const collectionSupported = NFT_CONTRACTS.find((item) => {
+    if (item.chain.id !== _chainId) return false;
+    
+    if (slug) {
+      return item.slug === slug;
+    }
+    
+    if (contractAddress) {
+      return item.address.toLowerCase() === contractAddress.toLowerCase();
+    }
+    
+    return false;
+  });
+
+  // Resolve the actual contract address from slug if needed
+  const resolvedContractAddress = slug 
+    ? collectionSupported?.address 
+    : contractAddress;
+
+  if (!resolvedContractAddress) {
+    throw new Error('Contract address could not be resolved');
+  }
   // You can remove this condition if you want to supported _any_ nft collection
   // or you can update the entries in `NFT_CONTRACTS`
   // if (!collectionSupported) {
@@ -83,7 +103,7 @@ export default function MarketplaceProvider({
   const contract = getContract({
     chain: marketplaceContract.chain,
     client,
-    address: contractAddress,
+    address: resolvedContractAddress,
   });
 
   const marketplace = getContract({

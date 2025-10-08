@@ -117,7 +117,7 @@ export function ProfileSection(props: Props) {
                   </TabList>
                 </Tabs>
                 <Link
-                  href={`/collection/${selectedCollection.chain.id}/${selectedCollection.address}`}
+                  href={`/collection/${selectedCollection.chain.id}/${selectedCollection.slug || selectedCollection.address}`}
                   color="gray"
                 >
                   View collection <ExternalLinkIcon mx="2px" />
@@ -151,7 +151,7 @@ export function ProfileSection(props: Props) {
                             rounded="12px"
                             as={Link}
                             href={`/collection/${contract.chain.id}/${
-                              contract.address
+                              selectedCollection.slug || contract.address
                             }/token/${item.asset.id.toString()}`}
                             _hover={{ textDecoration: 'none' }}
                             w={250}

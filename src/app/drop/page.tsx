@@ -78,7 +78,7 @@ function DropCard({ drop }: { drop: DropContract }) {
         <Link
           mt="auto"
           fontWeight="semibold"
-          href={`/drop/${drop.chain.id}/${drop.address}`}
+          href={`/drop/${drop.chain.id}/${drop.slug || drop.address}`}
           _hover={{ textDecoration: 'none' }}
         >
           View drop

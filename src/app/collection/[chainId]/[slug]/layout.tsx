@@ -6,10 +6,10 @@ export default function MarketplaceLayout({
   params,
 }: {
   children: ReactNode;
-  params: { contractAddress: string; chainId: string };
+  params: { slug: string; chainId: string };
 }) {
   return (
-    <MarketplaceProvider chainId={params.chainId} contractAddress={params.contractAddress}>
+    <MarketplaceProvider chainId={params.chainId} slug={params.slug}>
       {children}
     </MarketplaceProvider>
   );

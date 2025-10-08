@@ -71,21 +71,31 @@ export default function NftDropProvider({
   children,
   chainId,
   contractAddress,
+  slug,
 }: {
   children: ReactNode;
   chainId: string;
-  contractAddress: string;
+  contractAddress?: string;
+  slug?: string;
 }) {
   const parsedChainId = Number.parseInt(chainId, 10);
   if (Number.isNaN(parsedChainId)) {
     throw new Error('Invalid chain ID provided for drop page');
   }
 
-  const drop = DROP_CONTRACTS.find(
-    (entry) =>
-      entry.chain.id === parsedChainId &&
-      entry.address.toLowerCase() === contractAddress.toLowerCase()
-  );
+  const drop = DROP_CONTRACTS.find((entry) => {
+    if (entry.chain.id !== parsedChainId) return false;
+    
+    if (slug) {
+      return entry.slug === slug;
+    }
+    
+    if (contractAddress) {
+      return entry.address.toLowerCase() === contractAddress.toLowerCase();
+    }
+    
+    return false;
+  });
 
   if (!drop) {
     throw new Error('Drop configuration not found for this route');

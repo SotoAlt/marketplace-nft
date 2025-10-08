@@ -17,37 +17,25 @@ export type DropContract = {
 
 const baseDropContracts: DropContract[] = [
   {
-    address: '0xB4ab5b0A52432eA35030459958059a7B31E191C4',
+    address: '0x4633B5f2F84C5506AE3979d1eeB5E58C912CFA5B',
     chain: plasma,
     type: 'DropERC721',
     title: 'PRETRILLIONS',
     description: 'Claim experimental Plasma drop tokens while supplies last.',
     thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
-    slug: 'pretrillions-drop-nft',
+    slug: 'pretrillions',
     phaseDeadlines: [
       1760121600, // 2025-10-10T00:00:00Z
     ],
   },
   {
-    address: '0xCDCDf097D989073B4181A764dfa7310898B6Bde4',
+    address: '0xB4ab5b0A52432eA35030459958059a7B31E191C4',
     chain: plasma,
     type: 'DropERC721',
-    title: 'PRE-TEST',
-    description: 'Claim experimental Plasma drop tokens while supplies last.',
+    title: 'PRETRILLIONS Test',
+    description: 'Testing collection for original PRETRILLIONS contract.',
     thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
-    slug: 'pre-test-drop-nft',
-    phaseDeadlines: [
-      1760121600, // 2025-10-10T00:00:00Z
-    ],
-  },
-  {
-    address: '0x0ff6740cc055FbB5343fDD425E3722305d25BB63',
-    chain: plasma,
-    type: 'DropERC721',
-    title: 'TEST RANDOM',
-    description: 'Claim experimental Plasma drop tokens while supplies last.',
-    thumbnailUrl: NFT_PLACEHOLDER_IMAGE,
-    slug: 'test-random-drop-nft',
+    slug: 'pre-test-final',
     phaseDeadlines: [
       1760121600, // 2025-10-10T00:00:00Z
     ],
