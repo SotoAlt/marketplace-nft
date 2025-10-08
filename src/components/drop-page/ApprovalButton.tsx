@@ -50,25 +50,19 @@ export function ApprovalButton({
         setIsSwitching(false);
       }
     };
-  } else if (!isDropReady) {
-    buttonLabel = 'Drop not live';
-    isDisabled = true;
-  } else if (!isERC20Currency || !currencyAddress) {
-    buttonLabel = 'Approve 100 USDT0';
-    isDisabled = true;
   } else {
+    // Always enable the approval button when connected and on correct chain
     onClick = async () => {
-      if (!account || !currencyAddress) return;
+      if (!account) return;
       setIsApproving(true);
       try {
-        // Create USDT0 contract instance
+        // Always use hardcoded USDT0 contract for Plasma
         const usdtContract = getContract({
           client,
           chain: drop.chain,
-          address: currencyAddress,
+          address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', // USDT0 on Plasma
         });
 
-        // Create approval transaction for 100 USDT0
         const approvalTransaction = approve({
           contract: usdtContract,
           spender: contract.address,
