@@ -595,7 +595,7 @@ export function DropClaim() {
                           textTransform="uppercase"
                           fontSize="sm"
                         >
-                          Public
+                          Active
                         </Text>
                         <Badge
                           colorScheme={statusBadge.colorScheme}
@@ -946,8 +946,8 @@ function ClaimConditionsPanel({
                   align={{ base: 'flex-start', md: 'center' }}
                 >
                   <SimpleGrid columns={{ base: 2, md: 4 }} spacingX={6} spacingY={2} flex="1">
-                    <KeyValue label="Price" value={priceLabel} />
-                    <KeyValue label="Per wallet" value={perWalletValue} />
+                    <KeyValue label="Price" value="Depends on WL" />
+                    <KeyValue label="Per wallet" value="Depends on WL" />
                     <KeyValue label="Access" value={accessLabel} />
                     <KeyValue label="Starts" value={startDisplay} />
                   </SimpleGrid>
