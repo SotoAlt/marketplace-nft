@@ -1,6 +1,7 @@
 'use client';
 import { ClaimAction } from '@/components/drop-page/ClaimAction';
 import { ClaimControls } from '@/components/drop-page/ClaimControls';
+import { ApprovalButton } from '@/components/drop-page/ApprovalButton';
 import { client, NFT_PLACEHOLDER_IMAGE } from '@/consts/client';
 import { useNftDropContext } from '@/hooks/useNftDropContext';
 import {
@@ -624,6 +625,17 @@ export function DropClaim() {
                         isDropReady={isDropReady}
                         maxPerWalletLabel={maxPerWalletLabel}
                         withContainer={false}
+                        approvalAction={
+                          <ApprovalButton
+                            account={account}
+                            isConnected={isConnected}
+                            isCorrectChain={Boolean(isCorrectChain)}
+                            isDropReady={isDropReady}
+                            onConnect={handleConnect}
+                            onSwitchChain={() => switchChain(drop.chain)}
+                            chainName={drop.chain.name ?? 'Target Chain'}
+                          />
+                        }
                         action={
                           <ClaimAction
                             quantity={quantity}

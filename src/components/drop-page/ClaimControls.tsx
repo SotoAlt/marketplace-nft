@@ -18,6 +18,7 @@ export function ClaimControls({
   isDropReady,
   maxPerWalletLabel,
   action,
+  approvalAction,
   withContainer = true,
   containerProps,
 }: {
@@ -35,6 +36,7 @@ export function ClaimControls({
   isDropReady: boolean;
   maxPerWalletLabel: string | null;
   action: ReactNode;
+  approvalAction?: ReactNode;
   withContainer?: boolean;
   containerProps?: BoxProps;
 }) {
@@ -105,6 +107,11 @@ export function ClaimControls({
           </Text>
         )}
       </Skeleton>
+      {approvalAction && (
+        <Box>
+          {approvalAction}
+        </Box>
+      )}
       {action}
     </Flex>
   );
