@@ -43,6 +43,6 @@ export const plasma = defineChain({
       apiUrl: 'https://plasmascan.to/api',
     },
   ],
-  // Use private RPC if available, fallback to public RPC
-  rpc: process.env.NEXT_PUBLIC_PLASMA_MAINNET_RPC_URL || 'https://rpc.plasma.to',
+  // Use private RPC on server, public fallback on client
+  rpc: process.env.PLASMA_MAINNET_RPC_URL || 'https://rpc.plasma.to',
 });
