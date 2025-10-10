@@ -24,7 +24,7 @@ export const plasmaTestnet = defineChain({
       apiUrl: 'https://testnet.plasmascan.to/api',
     },
   ],
-  rpc: 'https://wild-purple-hill.plasma-testnet.quiknode.pro/0ea85c07ec31cfce02300197228e70fc73b72d80/',
+  rpc: process.env.NEXT_PUBLIC_PLASMA_TESTNET_RPC_URL || 'https://rpc.plasma.to',
   testnet: true,
 });
 
@@ -43,6 +43,6 @@ export const plasma = defineChain({
       apiUrl: 'https://plasmascan.to/api',
     },
   ],
-  // Oficial RPC https://rpc.plasma.to
-  rpc: 'https://wiser-dimensional-diamond.plasma-mainnet.quiknode.pro/2992f10bae5577cf72a6eb544b014a10b3ac5d9c',
+  // Use private RPC if available, fallback to public RPC
+  rpc: process.env.NEXT_PUBLIC_PLASMA_MAINNET_RPC_URL || 'https://rpc.plasma.to',
 });
